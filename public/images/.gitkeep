@@ -1,0 +1,30 @@
+# Place Roqeebat's photos here
+
+## Photo Organization:
+
+### Main Photos (for gallery):
+- photo1.jpg
+- photo2.jpg
+- photo3.jpg
+- photo4.jpg
+- photo5.jpg
+- photo6.jpg
+- photo7.jpg
+- photo8.jpg
+- photo9.jpg
+
+### Memory Photos (for Our Story section):
+- memory1.jpg
+- memory2.jpg
+- memory3.jpg
+- memory4.jpg
+
+### Videos:
+- special-moment.mp4 (add your video here)
+- memory-video.mp4 (optional second video)
+
+## Instructions:
+1. Copy all her photos into this folder
+2. Rename them to match the names above (or update config/content.ts with your actual filenames)
+3. Supported formats: .jpg, .jpeg, .png, .webp
+4. For videos: .mp4, .webm (MP4 recommended for best compatibility)

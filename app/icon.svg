@@ -1,0 +1,27 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Gradient definitions -->
+  <defs>
+    <linearGradient id="starGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#FFA500;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FF69B4;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Star shape -->
+  <path d="M64 10 L75.2 45.6 L112 45.6 L82.4 67.2 L93.6 102.8 L64 81.2 L34.4 102.8 L45.6 67.2 L16 45.6 L52.8 45.6 Z" 
+        fill="url(#starGradient)" 
+        filter="url(#glow)"
+        stroke="#FFD700" 
+        stroke-width="2"/>
+  
+  <!-- Center sparkle -->
+  <circle cx="64" cy="64" r="8" fill="white" opacity="0.9"/>
+</svg>
