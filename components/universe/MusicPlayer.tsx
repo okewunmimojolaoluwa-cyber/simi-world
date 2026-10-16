@@ -89,7 +89,9 @@ export default function MusicPlayer({ state, updateState, onBack }: MusicPlayerP
       setPlayingState(getIsPlaying());
     });
 
-    return unsubscribe;
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
   // Setup audio event listeners
