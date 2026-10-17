@@ -134,11 +134,11 @@ export async function POST(request: NextRequest) {
 }
 
 // Set max file size for Next.js (50MB)
-export const config = {
-  api: {
-    bodyParser: {
-      sizeLimit: '50mb',
-    },
-  },
-};
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
+// Modern way to configure body size in App Router
+// Note: Body size limits are now handled at the platform level
+// For Vercel: Configure in vercel.json
+// For other platforms: Configure in platform settings
 
