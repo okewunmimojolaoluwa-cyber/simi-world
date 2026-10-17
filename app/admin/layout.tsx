@@ -8,6 +8,9 @@ import { redirect } from 'next/navigation';
 import { getIronSession } from 'iron-session';
 import { SessionData, sessionOptions } from '@/lib/session';
 
+// Force dynamic rendering for layouts using cookies
+export const dynamic = 'force-dynamic';
+
 export default async function AdminLayout({
   children,
 }: {

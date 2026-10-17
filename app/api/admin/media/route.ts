@@ -9,6 +9,9 @@ import { cookies } from 'next/headers';
 import { sessionOptions, type SessionData } from '@/lib/session';
 import { supabaseAdmin } from '@/lib/auth';
 
+// Force dynamic rendering for routes using cookies
+export const dynamic = 'force-dynamic';
+
 // Check admin auth
 async function requireAdmin() {
   const session = await getIronSession<SessionData>(cookies(), sessionOptions);

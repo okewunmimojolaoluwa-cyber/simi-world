@@ -17,6 +17,9 @@ import {
 } from '@/lib/auth';
 import { sessionOptions, type SessionData } from '@/lib/session';
 
+// Force dynamic rendering for routes using cookies
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: NextRequest) {
   try {
     const { password, userType } = await request.json();
