@@ -14,10 +14,8 @@ export default function Universe() {
   const [isReplaying, setIsReplaying] = useState(false);
   const [showPasswordGate, setShowPasswordGate] = useState(false);
 
-  // Check if user needs to authenticate
-  const needsAuth = !authLoading && !authenticated && state?.birthdayIntroCompleted;
-
-  if (isLoading || authLoading || !state) {
+  // Only wait for universe state to load, not auth
+  if (isLoading || !state) {
     return <LoadingScreen />;
   }
 
@@ -57,7 +55,7 @@ export default function Universe() {
   }
 
   // Show password gate after intro (before dashboard)
-  if (needsAuth || showPasswordGate) {
+  if (showPasswordGate) {
     return (
       <main className="fixed inset-0 overflow-clip">
         <SimiPasswordGate
@@ -68,13 +66,25 @@ export default function Universe() {
     );
   }
 
-  // Show dashboard only when authenticated
+  // Show dashboard only when authenticated (or if auth is still loading, wait)
+  if (!authLoading && authenticated) {
+    return (
+      <main className="fixed inset-0 overflow-clip">
+        <WorldRoom
+          state={state}
+          updateState={updateState}
+          onReplayIntro={handleReplayIntro}
+        />
+      </main>
+    );
+  }
+
+  // If auth is loading or not authenticated, show password gate
   return (
     <main className="fixed inset-0 overflow-clip">
-      <WorldRoom
-        state={state}
-        updateState={updateState}
-        onReplayIntro={handleReplayIntro}
+      <SimiPasswordGate
+        onAuthenticated={handleAuthenticated}
+        onLogin={handleSimiLogin}
       />
     </main>
   );
