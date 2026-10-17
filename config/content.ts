@@ -2,12 +2,12 @@ export const CONTENT = {
   // Her Info
   HER_NAME: "Roqeebat",
   BIRTHDAY_DATE: "October 25",
-  LOCATION: "London",
+  LOCATION: "United Kingdom",
   
   // Fun Opening
   OPENING: {
     title: "🎉 BREAKING NEWS 🎉",
-    headline: "London Celebrates: It's Roqeebat Day!",
+    headline: "United Kingdom Celebrates: It's Roqeebat Day!",
     subheadline: "The most beautiful soul turns another year fabulous",
     buttonText: "Show Me The Love! 💝"
   },
@@ -22,8 +22,8 @@ export const CONTENT = {
     {
       id: 1,
       icon: "👑",
-      title: "London's Royalty",
-      message: "Officially the most stunning person to ever grace the city"
+      title: "UK's Royalty",
+      message: "Officially the most stunning person to ever grace the country"
     },
     {
       id: 2,
@@ -35,7 +35,7 @@ export const CONTENT = {
       id: 3,
       icon: "💪",
       title: "Strength Level",
-      message: "Handles London weather AND looks amazing doing it"
+      message: "Handles UK weather AND looks amazing doing it"
     },
     {
       id: 4,
@@ -64,9 +64,9 @@ export const CONTENT = {
       date: "Special Memory",
       description: "Every moment spent together brings joy and laughter.",
       image: "/images/gallery/cute-cat.jpg",
-      tags: ["London", "Memories", "Joy"],
+      tags: ["United Kingdom", "Memories", "Joy"],
       video: "",
-      location: "London, UK",
+      location: "United Kingdom",
     },
     {
       id: 2,
@@ -76,7 +76,7 @@ export const CONTENT = {
       image: "/images/gallery/photo1.jpg",
       tags: ["Queen", "Shine", "Love"],
       video: "",
-      location: "London, UK",
+      location: "United Kingdom",
     }
   ],
 

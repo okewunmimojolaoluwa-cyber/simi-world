@@ -12,7 +12,7 @@ export const WORLD = {
       month: 10,
       day: 25
     },
-    location: "London"
+    location: "United Kingdom"
   },
 
   // ═══════════════════════════════════════════════════════════
@@ -23,7 +23,7 @@ export const WORLD = {
     favoriteFood: "Jollof Rice",
     favoriteMovie: "Your favorite movie",
     favoriteSong: "Your favorite song",
-    favoritePlace: "London",
+    favoritePlace: "United Kingdom",
     lovesThesThings: [
       "Good music",
       "Great food",
@@ -37,7 +37,7 @@ export const WORLD = {
       "Fake people"
     ],
     funFacts: [
-      "Has the best laugh in London",
+      "Has the best laugh in the United Kingdom",
       "Can light up any room",
       "Master of comebacks",
       "Secret foodie",
@@ -65,7 +65,7 @@ export const WORLD = {
     { type: "joke", content: "What do you call a bear with no teeth? A gummy bear! 🐻" },
     { type: "question", content: "What made you smile today?" },
     { type: "question", content: "If you could go anywhere right now, where?" },
-    { type: "fact", content: "Did you know? You're the coolest person in London." },
+    { type: "fact", content: "Did you know? You're the coolest person in the United Kingdom." },
     { type: "challenge", content: "Today's mission: Do something that makes you laugh." },
     { type: "challenge", content: "Challenge: Make someone else smile today." },
     { type: "memory", content: "Remember that time you laughed so hard? That was great." },
