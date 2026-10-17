@@ -87,11 +87,18 @@ export default function AdminGestureLogin({
 
   return (
     <>
-      {/* Invisible click target overlay on the birthday text */}
-      <div
+      {/* Clickable wrapper for the birthday text */}
+      <span
         onClick={handleTextClick}
-        className="cursor-default select-none"
-        style={{ display: 'contents' }}
+        onTouchEnd={(e) => {
+          e.preventDefault();
+          handleTextClick();
+        }}
+        style={{ 
+          cursor: 'default',
+          userSelect: 'none',
+          WebkitTapHighlightColor: 'transparent',
+        }}
         role="button"
         tabIndex={0}
         onKeyDown={(e) => {
@@ -102,7 +109,7 @@ export default function AdminGestureLogin({
         aria-label="Admin access"
       >
         {targetText}
-      </div>
+      </span>
 
       {/* Click progress indicator (only visible when clicking) */}
       <AnimatePresence>
