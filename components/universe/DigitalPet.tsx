@@ -114,7 +114,7 @@ function CatController({ targetPos, animState, onReached, onPointerDown, bedPos,
   const SPEED      = 2.8;
   const TURN_SPEED = 8;
 
-  useFrame((_, delta) => {
+  useFrame((_state, delta: number) => {
     if (!groupRef.current) return;
     const cat = groupRef.current;
 
