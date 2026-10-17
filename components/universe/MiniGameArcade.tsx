@@ -256,7 +256,7 @@ function WordScramble({ onScore, onEnd, difficulty, settings }: {
     { word: 'BIRTHDAY', hint: '🎂 Today is your ___' },
     { word: 'BEAUTIFUL', hint: '💕 How you look always' },
     { word: 'ROQEEBAT', hint: '👑 The birthday girl' },
-    { word: 'LONDON', hint: '🇬🇧 Your city' },
+    { word: 'UNITEDKINGDOM', hint: '🇬🇧 Your country' },
     { word: 'STUNNING', hint: '✨ You are absolutely ___' },
     { word: 'CELEBRATE', hint: '🎉 Time to ___' },
     { word: 'AMAZING', hint: '🌟 You are ___' },

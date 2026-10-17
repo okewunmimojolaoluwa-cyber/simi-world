@@ -36,11 +36,11 @@ type TOD   = 'morning' | 'afternoon' | 'evening' | 'night';
 
 const clamp = (v: number) => Math.max(0, Math.min(100, v));
 
-// Synchronized with United Kingdom Time (Europe/London)
-export function getUKTime(): { tod: TOD; hour: number; minute: number; timeStr: string; isNight: boolean } {
+// Synchronized with Nigeria Time (Africa/Lagos)
+export function getNigeriaTime(): { tod: TOD; hour: number; minute: number; timeStr: string; isNight: boolean } {
   try {
     const formatter = new Intl.DateTimeFormat('en-GB', {
-      timeZone: 'Europe/London',
+      timeZone: 'Africa/Lagos',
       hour: 'numeric',
       minute: 'numeric',
       hourCycle: 'h23',
@@ -261,15 +261,15 @@ export default function DigitalPet({ onBack }: Props) {
   const [toast, setToast]     = useState('');
   const [cookingFood, setCookingFood] = useState<string | null>(null);
   const [cookProgress, setCookProgress] = useState(0);
-  const [ukTime, setUkTime]   = useState(getUKTime);
+  const [nigeriaTime, setNigeriaTime] = useState(getNigeriaTime);
   const [lampOn, setLampOn]   = useState(false);
-  const tod = ukTime.tod;
+  const tod = nigeriaTime.tod;
   const [returnMsg, setReturn]= useState('');
 
-  // Keep synchronized with United Kingdom (London) Time
+  // Keep synchronized with Nigeria (Lagos) Time
   useEffect(() => {
     const t = setInterval(() => {
-      setUkTime(getUKTime());
+      setNigeriaTime(getNigeriaTime());
     }, 20000);
     return () => clearInterval(t);
   }, []);
@@ -814,9 +814,9 @@ export default function DigitalPet({ onBack }: Props) {
         </div>
 
         <div style={S.levelBadge}>
-          {/* Time-based greeting with United Kingdom Time */}
+          {/* Time-based greeting with Nigeria Time */}
           <div style={{ fontSize: 9, color: 'rgba(200,168,48,0.7)', letterSpacing: '0.04em', marginBottom: 2 }}>
-            🇬🇧 London {ukTime.timeStr} ({ukTime.isNight ? 'Night' : 'Day'}) · {greeting}
+            �� Nigeria {nigeriaTime.timeStr} ({nigeriaTime.isNight ? 'Night' : 'Day'}) · {greeting}
           </div>
           <div style={{ fontSize: isMobile ? 11 : 12, color: '#e8d4a0', fontWeight: 700, letterSpacing: '0.08em' }}>
             OLAJUWON

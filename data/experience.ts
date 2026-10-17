@@ -44,7 +44,7 @@ export const EXPERIENCE = {
       type: "photograph",
       image: "/images/memories/2.jpg",
       caption: "You looked so happy here.",
-      date: "That day in London",
+      date: "That day in the United Kingdom",
       position: { x: 20, y: 15 }
     },
     {

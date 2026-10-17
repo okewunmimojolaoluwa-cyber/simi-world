@@ -27,7 +27,7 @@ const ITEMS: MediaItem[] = [
     id: 'pic-1',
     type: 'photo',
     src: '/images/gallery/photo1.jpg',
-    title: 'London Royalty 👑',
+    title: 'UK Royalty 👑',
     caption: 'Effortless grace and perfection in every single detail.',
     badge: 'PORTRAIT',
   },

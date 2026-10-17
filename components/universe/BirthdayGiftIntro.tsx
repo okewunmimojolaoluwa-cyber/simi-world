@@ -844,7 +844,7 @@ export default function BirthdayGiftIntro({ onUnlock }: BirthdayGiftIntroProps) 
               <div style={{ background: 'rgba(20,14,30,0.8)', border: '1px solid rgba(212,175,55,0.15)', borderRadius: 16, padding: 'clamp(16px,4vw,24px)', fontFamily: 'var(--font-playfair), Georgia, serif', fontStyle: 'italic', fontSize: 'clamp(0.9rem,3vw,1rem)', color: 'rgba(228,220,210,0.88)', lineHeight: 1.85 }}>
                 "October… the tenth month of the year.
                 <br /><br />
-                Every October, autumn turns to gold in London. It's the month you came into the world — and everything became brighter."
+                Every October, autumn turns to gold in the United Kingdom. It's the month you came into the world — and everything became brighter."
               </div>
 
               {/* Clue badge */}

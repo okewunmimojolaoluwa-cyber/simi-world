@@ -108,7 +108,7 @@ export const CONTENT = {
     {
       id: 1,
       url: "/images/gallery/photo1.jpg",
-      caption: "London's finest 👑",
+      caption: "United Kingdom's finest 👑",
     },
     {
       id: 2,
@@ -157,8 +157,8 @@ export const CONTENT = {
     {
       id: 1,
       icon: "👑",
-      title: "London's Royalty",
-      fact: "Officially the most stunning person to ever grace the city"
+      title: "UK Royalty",
+      fact: "Officially the most stunning person to ever grace the country"
     },
     {
       id: 2,
@@ -170,7 +170,7 @@ export const CONTENT = {
       id: 3,
       icon: "💪",
       title: "Strength Level",
-      fact: "Handles London weather AND looks amazing doing it"
+      fact: "Handles UK weather AND looks amazing doing it"
     },
     {
       id: 4,
@@ -211,7 +211,7 @@ export const CONTENT = {
     },
     {
       id: 4,
-      message: "Cheers to you surviving another year of London weather and STILL looking flawless! ☔→☀️",
+      message: "Cheers to you surviving another year of UK weather and STILL looking flawless! ☔→☀️",
       emoji: "🌟"
     },
     {
@@ -232,7 +232,7 @@ export const CONTENT = {
     paragraphs: [
       "Today is YOUR day! The world is literally better because you're in it.",
       "You're beautiful, you're strong, you're absolutely incredible, and you deserve to be celebrated not just today, but every single day.",
-      "From London to the world - you shine brighter than any light in the city. Keep being the amazing person you are!",
+      "From the United Kingdom to the world - you shine brighter than any light in the country. Keep being the amazing person you are!",
       "Here's to another year of being fabulous, making memories, and being absolutely unstoppable!",
       "Wishing you all the happiness, success, and blessings this year! You deserve it ALL! 💕"
     ],
