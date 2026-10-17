@@ -45,11 +45,13 @@ export default function AdminGestureLogin({
     };
   }, [clickCount]);
 
-  const handleTextClick = () => {
+  const handleTextClick = (e?: React.MouseEvent | React.TouchEvent) => {
+    console.log('[AdminGestureLogin] Click detected!', clickCount + 1);
     const newCount = clickCount + 1;
     setClickCount(newCount);
 
     if (newCount === 5) {
+      console.log('[AdminGestureLogin] 5 clicks reached! Showing prompt...');
       setShowPrompt(true);
       setClickCount(0);
     }
@@ -92,17 +94,22 @@ export default function AdminGestureLogin({
         onClick={handleTextClick}
         onTouchEnd={(e) => {
           e.preventDefault();
-          handleTextClick();
+          e.stopPropagation();
+          handleTextClick(e);
         }}
         style={{ 
-          cursor: 'default',
+          cursor: 'pointer',
           userSelect: 'none',
           WebkitTapHighlightColor: 'transparent',
+          position: 'relative',
+          zIndex: 100,
+          display: 'inline-block',
         }}
         role="button"
         tabIndex={0}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
             handleTextClick();
           }
         }}
@@ -118,15 +125,15 @@ export default function AdminGestureLogin({
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
-            className="fixed top-4 right-4 z-50 flex gap-1"
+            className="fixed top-4 right-4 z-[9999] flex gap-1"
           >
             {[...Array(5)].map((_, i) => (
               <div
                 key={i}
-                className={`w-2 h-2 rounded-full transition-all ${
+                className={`w-3 h-3 rounded-full transition-all ${
                   i < clickCount
-                    ? 'bg-yellow-400 scale-125'
-                    : 'bg-gray-600/30'
+                    ? 'bg-yellow-400 scale-125 shadow-lg shadow-yellow-400/50'
+                    : 'bg-gray-600/50'
                 }`}
               />
             ))}
@@ -144,7 +151,7 @@ export default function AdminGestureLogin({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={handleClose}
-              className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50"
+              className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9998]"
             />
 
             {/* Modal */}
@@ -153,7 +160,7 @@ export default function AdminGestureLogin({
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: -20 }}
               transition={{ type: 'spring', damping: 20 }}
-              className="fixed inset-0 flex items-center justify-center z-50 px-4"
+              className="fixed inset-0 flex items-center justify-center z-[9999] px-4"
             >
               <div className="w-full max-w-sm bg-gradient-to-br from-gray-900 to-black border border-yellow-500/30 rounded-2xl shadow-2xl p-6">
                 {/* Header */}
