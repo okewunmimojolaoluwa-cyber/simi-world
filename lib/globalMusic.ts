@@ -1,11 +1,22 @@
 // GLOBAL MUSIC PLAYER
 // Persists across navigation, stops on page unload
+// Tracks are loaded dynamically from database
 
 let globalAudio: HTMLAudioElement | null = null;
 let currentTrackIndex: number = 0;
 let isPlaying: boolean = false;
 
-export const TRACKS = [
+// Music tracks interface
+export interface Track {
+  id: number;
+  title: string;
+  artist: string;
+  file: string;
+  color: string;
+}
+
+// Default hardcoded tracks (fallback if database empty)
+const DEFAULT_TRACKS: Track[] = [
   { id: 1,  title: "Who's Dat Girl",     artist: 'Ayra Starr ft. Rema',   file: '/audio/Ayra_Starr_Ft_Rema_Whos_Dat_Girl_2621_AllNaijaMusic.mp3',      color: '#e8405a' },
   { id: 2,  title: 'Cutesy',             artist: 'BNXN',                   file: '/audio/BNXN_Cutesy_7677_AllNaijaMusic.mp3',                            color: '#a060e8' },
   { id: 3,  title: 'Eja Meja',           artist: 'BNXN ft. Asake',         file: '/audio/BNXN_Ft_Asake_Eja_Meja_7316_AllNaijaMusic.mp3',                 color: '#40c8a0' },
@@ -18,6 +29,57 @@ export const TRACKS = [
   { id: 10, title: 'GTA',               artist: 'Seyi Vibez',             file: '/audio/Seyi_Vibez_GTA_2452_AllNaijaMusic.mp3',                         color: '#e8c040' },
   { id: 11, title: "Where I'm From",    artist: 'TML Vibez ft. Seyi Vibez', file: '/audio/TML_Vibez_ft_Seyi_Vibez_Where_Im_From_6025_AllNaijaMusic.mp3', color: '#8040e8' },
 ];
+
+// Dynamic tracks (loaded from database)
+let dynamicTracks: Track[] = [];
+let tracksLoaded = false;
+
+// Export TRACKS - will be updated when loaded from database
+export let TRACKS: Track[] = DEFAULT_TRACKS;
+
+/**
+ * Fetch tracks from database
+ */
+async function loadTracksFromDatabase(): Promise<void> {
+  if (tracksLoaded) return;
+  
+  try {
+    const response = await fetch('/api/media?type=music');
+    if (!response.ok) {
+      console.warn('[globalMusic] Database fetch failed, using defaults');
+      return;
+    }
+
+    const data = await response.json();
+    const dbTracks = data.media || [];
+
+    if (dbTracks.length === 0) {
+      console.log('[globalMusic] No music in database, using defaults');
+      return;
+    }
+
+    // Convert database format to Track format
+    const colors = ['#e8405a', '#a060e8', '#40c8a0', '#e88040', '#40a0e8', '#e840c8', '#c8e840', '#e84060', '#60e8a0', '#e8c040', '#8040e8', '#4060e8'];
+    dynamicTracks = dbTracks.map((item: any, index: number) => ({
+      id: index + 1,
+      title: item.title,
+      artist: item.artist || 'Unknown Artist',
+      file: item.publicUrl,
+      color: colors[index % colors.length],
+    }));
+
+    TRACKS = dynamicTracks;
+    tracksLoaded = true;
+    console.log('[globalMusic] Loaded', TRACKS.length, 'tracks from database');
+  } catch (error) {
+    console.error('[globalMusic] Error loading tracks:', error);
+  }
+}
+
+// Load tracks on initialization (client-side only)
+if (typeof window !== 'undefined') {
+  loadTracksFromDatabase();
+}
 
 type MusicListener = () => void;
 const listeners: Set<MusicListener> = new Set();
