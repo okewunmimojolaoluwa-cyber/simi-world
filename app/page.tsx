@@ -21,13 +21,12 @@ export default function Universe() {
     return <LoadingScreen />;
   }
 
-  // CRITICAL: Show intro if birthdayIntroCompleted is not explicitly true
-  // This ensures even after refresh, the intro is required until completed
-  const shouldShowBirthdayIntro = state.birthdayIntroCompleted !== true || isReplaying;
+  // IMPORTANT: ALWAYS show intro on page load/refresh
+  // Remove the birthdayIntroCompleted check to force intro every time
+  const shouldShowBirthdayIntro = true; // Always show intro, ignore saved state
 
   const handleUnlockBirthday = () => {
-    // Ensure the completion is saved immediately and persistently
-    updateState({ birthdayIntroCompleted: true });
+    // Don't save completion state - we want intro to show every time
     setIsReplaying(false);
     // Show password gate after intro completion
     setShowPasswordGate(true);
