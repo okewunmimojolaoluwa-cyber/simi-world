@@ -15,7 +15,7 @@ import {
   getClientIp,
   type UserType,
 } from '@/lib/auth';
-import { sessionOptions } from '@/lib/session';
+import { sessionOptions, type SessionData } from '@/lib/session';
 
 export async function POST(request: NextRequest) {
   try {
@@ -64,9 +64,9 @@ export async function POST(request: NextRequest) {
     await clearFailedAttempts(ipAddress, userType);
 
     // Create session
-    const session = await getIronSession(cookies(), sessionOptions);
-    session.userType = userType;
-    session.authenticated = true;
+    const session = await getIronSession<SessionData>(cookies(), sessionOptions);
+    session.isLoggedIn = true;
+    session.role = userType;
     session.loginTime = new Date().toISOString();
     await session.save();
 

@@ -6,13 +6,13 @@
 import { NextResponse } from 'next/server';
 import { getIronSession } from 'iron-session';
 import { cookies } from 'next/headers';
-import { sessionOptions } from '@/lib/session';
+import { sessionOptions, type SessionData } from '@/lib/session';
 
 export async function GET() {
   try {
-    const session = await getIronSession(cookies(), sessionOptions);
+    const session = await getIronSession<SessionData>(cookies(), sessionOptions);
 
-    if (!session.authenticated || !session.userType) {
+    if (!session.isLoggedIn || !session.role) {
       return NextResponse.json({
         authenticated: false,
         userType: null,
@@ -21,7 +21,7 @@ export async function GET() {
 
     return NextResponse.json({
       authenticated: true,
-      userType: session.userType,
+      userType: session.role,
       loginTime: session.loginTime,
     });
   } catch (error) {

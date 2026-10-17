@@ -21,9 +21,9 @@ export const supabaseAdmin = supabaseUrl && serviceRoleKey
 export type UserType = 'simi' | 'admin';
 
 export interface SessionData {
-  userType: UserType;
-  authenticated: boolean;
-  loginTime: string;
+  isLoggedIn: boolean;
+  role: 'simi' | 'admin';
+  loginTime?: string;
 }
 
 /**

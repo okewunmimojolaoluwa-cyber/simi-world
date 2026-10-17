@@ -3,7 +3,13 @@
  */
 
 import { SessionOptions } from 'iron-session';
-import type { SessionData } from './auth';
+
+// Session data type
+export interface SessionData {
+  isLoggedIn: boolean;
+  role: 'simi' | 'admin';
+  loginTime?: string;
+}
 
 export const sessionOptions: SessionOptions = {
   password: process.env.SESSION_SECRET || 'complex_password_at_least_32_characters_long',
@@ -19,6 +25,10 @@ export const sessionOptions: SessionOptions = {
 
 // Extend the default session data type
 declare module 'iron-session' {
-  interface IronSessionData extends SessionData {}
+  interface IronSessionData {
+    isLoggedIn?: boolean;
+    role?: 'simi' | 'admin';
+    loginTime?: string;
+  }
 }
 

@@ -3,7 +3,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { sounds } from '@/lib/audioSynthesis';
+import { useAuth } from '@/hooks/useAuth';
+import { useRouter } from 'next/navigation';
 import CatIcon from '@/components/world/CatIcon';
+import AdminGestureLogin from '@/components/auth/AdminGestureLogin';
 
 interface BirthdayGiftIntroProps {
   onUnlock: () => void;
@@ -53,6 +56,8 @@ export default function BirthdayGiftIntro({ onUnlock }: BirthdayGiftIntroProps) 
   const [act, setAct] = useState<Act>('opening');
   const [activeStation, setActiveStation] = useState<ActiveStation>(null);
   const [mounted, setMounted] = useState(false);
+  const { login } = useAuth();
+  const router = useRouter();
 
   // Clue discovery states
   const [discoveredMonth, setDiscoveredMonth] = useState(false);
@@ -68,6 +73,15 @@ export default function BirthdayGiftIntro({ onUnlock }: BirthdayGiftIntroProps) 
   const [shakeGift, setShakeGift] = useState(false);
 
   useEffect(() => { setMounted(true); }, []);
+
+  const handleAdminLogin = async (password: string) => {
+    return await login(password, 'admin');
+  };
+
+  const handleAdminAuthenticated = () => {
+    // Redirect to admin dashboard
+    router.push('/admin');
+  };
 
   const handleStartAdventure = () => {
     sounds.startRoomTone();
@@ -259,9 +273,15 @@ export default function BirthdayGiftIntro({ onUnlock }: BirthdayGiftIntroProps) 
                 />
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: 'clamp(10px, 3vw, 14px)', background: 'linear-gradient(135deg, rgba(255,215,0,0.22), rgba(255,140,0,0.18), rgba(255,107,157,0.15))', border: '1.5px solid rgba(255,215,0,0.65)', borderRadius: 100, padding: 'clamp(10px, 2.5vw, 12px) clamp(18px, 5vw, 28px)', backdropFilter: 'blur(16px)', boxShadow: '0 12px 40px rgba(255,215,0,0.3), 0 0 60px rgba(255,107,157,0.15), inset 0 1px 0 rgba(255,255,255,0.2)' }}>
                   <motion.span animate={{ scale: [1, 1.5, 1], rotate: [0, 360] }} transition={{ duration: 2.5, repeat: Infinity }} style={{ fontSize: 'clamp(16px, 4vw, 18px)' }}>🎂</motion.span>
-                  <span style={{ fontSize: 'clamp(11px, 2.8vw, 15px)', fontWeight: 800, letterSpacing: '0.1em', color: '#ffe8a0', textShadow: '0 2px 8px rgba(0,0,0,0.6)', fontFamily: 'var(--font-playfair), Georgia, serif', fontStyle: 'italic', whiteSpace: 'nowrap' }}>
-                    Happy Birthday My Baby
-                  </span>
+                  <AdminGestureLogin
+                    targetText={
+                      <span style={{ fontSize: 'clamp(11px, 2.8vw, 15px)', fontWeight: 800, letterSpacing: '0.1em', color: '#ffe8a0', textShadow: '0 2px 8px rgba(0,0,0,0.6)', fontFamily: 'var(--font-playfair), Georgia, serif', fontStyle: 'italic', whiteSpace: 'nowrap' }}>
+                        Happy Birthday My Baby
+                      </span>
+                    }
+                    onAdminLogin={handleAdminLogin}
+                    onAuthenticated={handleAdminAuthenticated}
+                  />
                   <motion.span animate={{ scale: [1, 1.5, 1] }} transition={{ duration: 2.5, repeat: Infinity, delay: 1.25 }} style={{ fontSize: 'clamp(16px, 4vw, 18px)' }}>💖</motion.span>
                 </div>
               </motion.div>

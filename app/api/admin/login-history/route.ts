@@ -7,13 +7,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getIronSession } from 'iron-session';
 import { cookies } from 'next/headers';
-import { sessionOptions } from '@/lib/session';
+import { sessionOptions, type SessionData } from '@/lib/session';
 import { supabaseAdmin } from '@/lib/auth';
 
 // Check admin auth
 async function requireAdmin() {
-  const session = await getIronSession(cookies(), sessionOptions);
-  if (!session.authenticated || session.userType !== 'admin') {
+  const session = await getIronSession<SessionData>(cookies(), sessionOptions);
+  if (!session.isLoggedIn || session.role !== 'admin') {
     throw new Error('Unauthorized');
   }
   return session;
