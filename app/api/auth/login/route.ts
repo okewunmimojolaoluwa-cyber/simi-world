@@ -67,7 +67,8 @@ export async function POST(request: NextRequest) {
     await clearFailedAttempts(ipAddress, userType);
 
     // Create session
-    const session = await getIronSession<SessionData>(cookies(), sessionOptions);
+    const cookieStore = await cookies();
+    const session = await getIronSession<SessionData>(cookieStore, sessionOptions);
     session.isLoggedIn = true;
     session.role = userType;
     session.loginTime = new Date().toISOString();

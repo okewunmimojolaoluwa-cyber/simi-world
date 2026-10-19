@@ -18,7 +18,8 @@ import {
 
 // Check admin auth
 async function requireAdmin() {
-  const session = await getIronSession<SessionData>(cookies(), sessionOptions);
+  const cookieStore = await cookies();
+  const session = await getIronSession<SessionData>(cookieStore, sessionOptions);
   if (!session.isLoggedIn || session.role !== 'admin') {
     throw new Error('Unauthorized');
   }

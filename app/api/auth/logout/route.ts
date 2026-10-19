@@ -13,7 +13,8 @@ export const dynamic = 'force-dynamic';
 
 export async function POST() {
   try {
-    const session = await getIronSession<SessionData>(cookies(), sessionOptions);
+    const cookieStore = await cookies();
+    const session = await getIronSession<SessionData>(cookieStore, sessionOptions);
     session.destroy();
 
     return NextResponse.json({ success: true });
