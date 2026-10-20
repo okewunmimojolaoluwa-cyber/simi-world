@@ -1,12 +1,18 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { useUniverse } from '@/hooks/useUniverse';
 import { useAuth } from '@/hooks/useAuth';
 import LoadingScreen from '@/components/universe/LoadingScreen';
-import WorldRoom from '@/components/world/WorldRoom';
 import BirthdayGiftIntro from '@/components/universe/BirthdayGiftIntro';
 import SimiPasswordGate from '@/components/auth/SimiPasswordGate';
+
+// Dynamically import WorldRoom with no SSR to prevent Three.js build issues
+const WorldRoom = dynamic(() => import('@/components/world/WorldRoom'), {
+  ssr: false,
+  loading: () => <LoadingScreen />,
+});
 
 // Force dynamic rendering - required for client-only components
 export const dynamic = 'force-dynamic';
