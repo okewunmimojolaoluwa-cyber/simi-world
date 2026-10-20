@@ -10,7 +10,6 @@ import SimiPasswordGate from '@/components/auth/SimiPasswordGate';
 
 // Force dynamic rendering - required for client-only components
 export const dynamic = 'force-dynamic';
-export const runtime = 'edge';
 
 export default function Universe() {
   const { state, isLoading, updateState } = useUniverse();
