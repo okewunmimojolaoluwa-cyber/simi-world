@@ -4,12 +4,13 @@ const nextConfig = {
   images: {
     domains: ['images.unsplash.com'],
   },
-  // Disable static page generation for pages with client-only components
   experimental: {
     serverActions: {
       bodySizeLimit: '10mb',
     },
   },
+  // Ensure proper transpilation for Three.js and related packages
+  transpilePackages: ['three', '@react-three/fiber', '@react-three/drei'],
 }
 
 module.exports = nextConfig

@@ -14,9 +14,6 @@ const WorldRoom = dynamic(() => import('@/components/world/WorldRoom'), {
   loading: () => <LoadingScreen />,
 });
 
-// Force dynamic rendering - required for client-only components
-export const dynamic = 'force-dynamic';
-
 export default function Universe() {
   const { state, isLoading, updateState } = useUniverse();
   const { authenticated, userType, loading: authLoading, login } = useAuth();
