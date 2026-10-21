@@ -79,8 +79,9 @@ export default function BirthdayGiftIntro({ onUnlock }: BirthdayGiftIntroProps) 
   };
 
   const handleAdminAuthenticated = () => {
-    // Redirect to admin dashboard
-    router.push('/admin');
+    // Force a full page navigation to admin dashboard
+    // This ensures the session is properly checked
+    window.location.href = '/admin';
   };
 
   const handleStartAdventure = () => {
