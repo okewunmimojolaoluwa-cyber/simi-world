@@ -35,6 +35,13 @@ export default function WorldRoom({ state, updateState, onReplayIntro }: WorldRo
   const [birthdayMode, setBirthdayMode] = useState(false);
   const [confettiItems] = useState<Array<{x:number;dur:number;delay:number;rotate:number;emoji:string}>>([]);
   const [renderError, setRenderError] = useState<string | null>(null);
+  const [isClient, setIsClient] = useState(false);
+
+  // Ensure we're on the client
+  useEffect(() => {
+    setIsClient(true);
+    console.log('[WorldRoom] Component mounted, state:', state);
+  }, [state]);
 
   // Add error boundary at component level
   useEffect(() => {
@@ -46,6 +53,28 @@ export default function WorldRoom({ state, updateState, onReplayIntro }: WorldRo
     window.addEventListener('error', handleError);
     return () => window.removeEventListener('error', handleError);
   }, []);
+
+  // Show loading while client initializes
+  if (!isClient) {
+    console.log('[WorldRoom] Waiting for client initialization...');
+    return (
+      <div style={{ 
+        position: 'fixed', 
+        inset: 0, 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        background: 'linear-gradient(135deg, #1a0f1e 0%, #2d1b3d 100%)',
+        color: '#fff',
+        fontFamily: 'system-ui, sans-serif'
+      }}>
+        <div style={{ textAlign: 'center', padding: 32 }}>
+          <h2 style={{ fontSize: 28, fontWeight: 'bold', marginBottom: 16 }}>✨ Preparing Your World</h2>
+          <p style={{ color: '#c4b5fd', fontSize: 16 }}>Just a moment...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Show error UI if component has an error
   if (renderError) {
@@ -85,6 +114,8 @@ export default function WorldRoom({ state, updateState, onReplayIntro }: WorldRo
       </div>
     );
   }
+
+  console.log('[WorldRoom] Rendering main world UI, currentView:', currentView);
 
   // Determine time of day
   useEffect(() => {
