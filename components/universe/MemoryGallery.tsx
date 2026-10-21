@@ -102,7 +102,7 @@ export default function MemoryGallery({ onBack }: MemoryGalleryProps) {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedItem, filter]);
+  }, [selectedItem, filter, handleNext, handlePrev]);
 
   // Lock background scroll when viewer is open
   useEffect(() => {
