@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { UniverseState } from '@/lib/persistence';
@@ -90,6 +90,35 @@ export default function MemoryGallery({ onBack }: MemoryGalleryProps) {
     setMounted(true);
   }, []);
 
+  const filteredItems = ITEMS.filter((item) => {
+    if (filter === 'photos') return item.type === 'photo';
+    if (filter === 'videos') return item.type === 'video';
+    return true;
+  });
+
+  const photoCount = ITEMS.filter((i) => i.type === 'photo').length;
+  const videoCount = ITEMS.filter((i) => i.type === 'video').length;
+
+  const handleNext = useCallback(() => {
+    if (!selectedItem) return;
+    const currentIndex = filteredItems.findIndex((i) => i.id === selectedItem.id);
+    if (currentIndex < filteredItems.length - 1) {
+      setSelectedItem(filteredItems[currentIndex + 1]);
+    } else {
+      setSelectedItem(filteredItems[0]);
+    }
+  }, [selectedItem, filteredItems]);
+
+  const handlePrev = useCallback(() => {
+    if (!selectedItem) return;
+    const currentIndex = filteredItems.findIndex((i) => i.id === selectedItem.id);
+    if (currentIndex > 0) {
+      setSelectedItem(filteredItems[currentIndex - 1]);
+    } else {
+      setSelectedItem(filteredItems[filteredItems.length - 1]);
+    }
+  }, [selectedItem, filteredItems]);
+
   // Keyboard navigation for viewer
   useEffect(() => {
     if (!selectedItem) return;
@@ -102,7 +131,7 @@ export default function MemoryGallery({ onBack }: MemoryGalleryProps) {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedItem, filter, handleNext, handlePrev]);
+  }, [selectedItem, handleNext, handlePrev]);
 
   // Lock background scroll when viewer is open
   useEffect(() => {
@@ -115,35 +144,6 @@ export default function MemoryGallery({ onBack }: MemoryGalleryProps) {
       document.body.style.overflow = '';
     };
   }, [selectedItem]);
-
-  const filteredItems = ITEMS.filter((item) => {
-    if (filter === 'photos') return item.type === 'photo';
-    if (filter === 'videos') return item.type === 'video';
-    return true;
-  });
-
-  const photoCount = ITEMS.filter((i) => i.type === 'photo').length;
-  const videoCount = ITEMS.filter((i) => i.type === 'video').length;
-
-  const handleNext = () => {
-    if (!selectedItem) return;
-    const currentIndex = filteredItems.findIndex((i) => i.id === selectedItem.id);
-    if (currentIndex < filteredItems.length - 1) {
-      setSelectedItem(filteredItems[currentIndex + 1]);
-    } else {
-      setSelectedItem(filteredItems[0]);
-    }
-  };
-
-  const handlePrev = () => {
-    if (!selectedItem) return;
-    const currentIndex = filteredItems.findIndex((i) => i.id === selectedItem.id);
-    if (currentIndex > 0) {
-      setSelectedItem(filteredItems[currentIndex - 1]);
-    } else {
-      setSelectedItem(filteredItems[filteredItems.length - 1]);
-    }
-  };
 
   return (
     <div className="relative w-full min-h-screen flex flex-col items-center px-4 sm:px-6 lg:px-12 pb-24 pt-20 md:pt-24 bg-gradient-to-b from-[#0a0712] via-[#120d20] to-[#080510] text-[#fef9f5]">

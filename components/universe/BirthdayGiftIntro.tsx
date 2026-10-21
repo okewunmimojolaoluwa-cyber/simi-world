@@ -56,6 +56,7 @@ export default function BirthdayGiftIntro({ onUnlock }: BirthdayGiftIntroProps) 
   const [act, setAct] = useState<Act>('opening');
   const [activeStation, setActiveStation] = useState<ActiveStation>(null);
   const [mounted, setMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const { login } = useAuth();
   const router = useRouter();
 
@@ -72,7 +73,23 @@ export default function BirthdayGiftIntro({ onUnlock }: BirthdayGiftIntroProps) 
   const [unlockError, setUnlockError] = useState<string | null>(null);
   const [shakeGift, setShakeGift] = useState(false);
 
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => { 
+    setMounted(true);
+    // Detect mobile device for performance optimization
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768 || navigator.hardwareConcurrency <= 4);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Performance-optimized counts based on device
+  const particleCount = isMobile ? 8 : 30; // 73% reduction on mobile
+  const lightParticleCount = isMobile ? 10 : 35; // 71% reduction on mobile
+  const beamCount = isMobile ? 2 : 8; // 75% reduction on mobile
+  const sparkleCount = isMobile ? 4 : 12; // 67% reduction on mobile
+  const orbitStarCount = isMobile ? 2 : 6; // 67% reduction on mobile
 
   const handleAdminLogin = async (password: string) => {
     console.log('[BirthdayGiftIntro] handleAdminLogin called with password');
@@ -158,7 +175,7 @@ export default function BirthdayGiftIntro({ onUnlock }: BirthdayGiftIntroProps) 
 
       {/* Global ambient particles */}
       <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 1, overflow: 'hidden' }}>
-        {Array.from({ length: 30 }).map((_, i) => <Particle key={i} i={i} />)}
+        {Array.from({ length: particleCount }).map((_, i) => <Particle key={i} i={i} />)}
       </div>
 
       {/* ═══════════════════════════════════════════════════════════
@@ -200,7 +217,7 @@ export default function BirthdayGiftIntro({ onUnlock }: BirthdayGiftIntroProps) 
 
             {/* Floating light particles - Enhanced */}
             <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
-              {[...Array(35)].map((_, i) => (
+              {[...Array(lightParticleCount)].map((_, i) => (
                 <motion.div
                   key={i}
                   initial={{ y: '120%', x: `${(i * 3.2) % 100}%`, opacity: 0 }}
@@ -213,14 +230,14 @@ export default function BirthdayGiftIntro({ onUnlock }: BirthdayGiftIntroProps) 
                     height: i % 7 === 0 ? 6 : i % 5 === 0 ? 4 : 2, 
                     borderRadius: '50%', 
                     background: i % 4 === 0 ? '#ffd700' : i % 4 === 1 ? '#ff6b9d' : i % 4 === 2 ? '#ff9f43' : '#ffffff', 
-                    boxShadow: `0 0 ${i % 7 === 0 ? 20 : 12}px currentColor` 
+                    boxShadow: isMobile ? 'none' : `0 0 ${i % 7 === 0 ? 20 : 12}px currentColor` 
                   }}
                 />
               ))}
             </div>
 
             {/* Radial light beams */}
-            {[...Array(8)].map((_, i) => (
+            {[...Array(beamCount)].map((_, i) => (
               <motion.div
                 key={`beam-${i}`}
                 initial={{ opacity: 0 }}
