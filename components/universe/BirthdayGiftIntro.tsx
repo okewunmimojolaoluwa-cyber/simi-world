@@ -75,10 +75,14 @@ export default function BirthdayGiftIntro({ onUnlock }: BirthdayGiftIntroProps) 
   useEffect(() => { setMounted(true); }, []);
 
   const handleAdminLogin = async (password: string) => {
-    return await login(password, 'admin');
+    console.log('[BirthdayGiftIntro] handleAdminLogin called with password');
+    const result = await login(password, 'admin');
+    console.log('[BirthdayGiftIntro] Login result:', result);
+    return result;
   };
 
   const handleAdminAuthenticated = () => {
+    console.log('[BirthdayGiftIntro] handleAdminAuthenticated called - redirecting to /admin');
     // Force a full page navigation to admin dashboard
     // This ensures the session is properly checked
     window.location.href = '/admin';

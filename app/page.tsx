@@ -96,21 +96,46 @@ export default function Universe() {
     // Safety check - ensure state exists
     if (!state) {
       console.error('[Universe] State is null when trying to render WorldRoom!');
-      return <LoadingScreen />;
+      return (
+        <main className="fixed inset-0 overflow-clip">
+          <div style={{ 
+            position: 'fixed', 
+            inset: 0, 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            background: 'linear-gradient(135deg, #1a0f1e 0%, #2d1b3d 100%)',
+            color: '#fff',
+            fontFamily: 'system-ui, sans-serif'
+          }}>
+            <div style={{ textAlign: 'center', padding: 32 }}>
+              <h2 style={{ fontSize: 28, fontWeight: 'bold', marginBottom: 16 }}>⚠️ State Error</h2>
+              <p style={{ color: '#c4b5fd', fontSize: 16 }}>Unable to load your universe data</p>
+              <button 
+                onClick={() => window.location.reload()} 
+                style={{ 
+                  marginTop: 24, 
+                  padding: '12px 24px', 
+                  background: '#c4b5fd', 
+                  color: '#1a0f1e', 
+                  border: 'none', 
+                  borderRadius: 8, 
+                  cursor: 'pointer',
+                  fontSize: 16,
+                  fontWeight: 600
+                }}
+              >
+                Reload Page
+              </button>
+            </div>
+          </div>
+        </main>
+      );
     }
 
     return (
       <main className="fixed inset-0 overflow-clip">
-        <ErrorBoundary 
-          fallback={
-            <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-gray-900 to-black text-white">
-              <div className="text-center p-8">
-                <h2 className="text-2xl font-bold mb-4">Loading Your World...</h2>
-                <p className="text-gray-400">Setting up the experience</p>
-              </div>
-            </div>
-          }
-        >
+        <ErrorBoundary>
           <WorldRoom
             state={state}
             updateState={updateState}
@@ -128,10 +153,10 @@ export default function Universe() {
 
 // Simple Error Boundary Component
 class ErrorBoundary extends React.Component<
-  { children: React.ReactNode; fallback: React.ReactNode },
+  { children: React.ReactNode },
   { hasError: boolean; error: Error | null }
 > {
-  constructor(props: { children: React.ReactNode; fallback: React.ReactNode }) {
+  constructor(props: { children: React.ReactNode }) {
     super(props);
     this.state = { hasError: false, error: null };
   }
@@ -149,7 +174,24 @@ class ErrorBoundary extends React.Component<
   render() {
     if (this.state.hasError) {
       console.error('[ErrorBoundary] Rendering fallback due to error:', this.state.error);
-      return this.props.fallback;
+      return (
+        <div style={{ 
+          position: 'fixed', 
+          inset: 0, 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          background: 'linear-gradient(135deg, #1a0f1e 0%, #2d1b3d 100%)',
+          color: '#fff',
+          fontFamily: 'system-ui, sans-serif'
+        }}>
+          <div style={{ textAlign: 'center', padding: 32 }}>
+            <h2 style={{ fontSize: 28, fontWeight: 'bold', marginBottom: 16 }}>✨ Loading Your World...</h2>
+            <p style={{ color: '#c4b5fd', fontSize: 16 }}>Setting up your experience</p>
+            <p style={{ color: '#9ca3af', fontSize: 14, marginTop: 12 }}>If this takes too long, try refreshing the page</p>
+          </div>
+        </div>
+      );
     }
     return this.props.children;
   }

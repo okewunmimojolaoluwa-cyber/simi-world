@@ -34,6 +34,57 @@ export default function WorldRoom({ state, updateState, onReplayIntro }: WorldRo
   const [timeOfDay, setTimeOfDay] = useState<'morning' | 'afternoon' | 'evening' | 'night'>('evening');
   const [birthdayMode, setBirthdayMode] = useState(false);
   const [confettiItems] = useState<Array<{x:number;dur:number;delay:number;rotate:number;emoji:string}>>([]);
+  const [renderError, setRenderError] = useState<string | null>(null);
+
+  // Add error boundary at component level
+  useEffect(() => {
+    const handleError = (event: ErrorEvent) => {
+      console.error('[WorldRoom] Runtime error caught:', event.error);
+      setRenderError(event.error?.message || 'An unexpected error occurred');
+    };
+
+    window.addEventListener('error', handleError);
+    return () => window.removeEventListener('error', handleError);
+  }, []);
+
+  // Show error UI if component has an error
+  if (renderError) {
+    return (
+      <div style={{ 
+        position: 'fixed', 
+        inset: 0, 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        background: 'linear-gradient(135deg, #1a0f1e 0%, #2d1b3d 100%)',
+        color: '#fff',
+        fontFamily: 'system-ui, sans-serif',
+        zIndex: 10000
+      }}>
+        <div style={{ textAlign: 'center', padding: 32, maxWidth: 500 }}>
+          <h2 style={{ fontSize: 28, fontWeight: 'bold', marginBottom: 16 }}>✨ Setting Up Your World</h2>
+          <p style={{ color: '#c4b5fd', fontSize: 16, marginBottom: 8 }}>Just a moment...</p>
+          <p style={{ color: '#9ca3af', fontSize: 14 }}>{renderError}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            style={{ 
+              marginTop: 24, 
+              padding: '12px 24px', 
+              background: '#c4b5fd', 
+              color: '#1a0f1e', 
+              border: 'none', 
+              borderRadius: 8, 
+              cursor: 'pointer',
+              fontSize: 16,
+              fontWeight: 600
+            }}
+          >
+            Refresh
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // Determine time of day
   useEffect(() => {

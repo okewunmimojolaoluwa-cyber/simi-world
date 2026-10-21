@@ -55,6 +55,7 @@ export function useAuth() {
   };
 
   const login = async (password: string, userType: 'simi' | 'admin'): Promise<{ success: boolean; error?: string }> => {
+    console.log('[useAuth] login() called -', { userType });
     try {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
@@ -63,8 +64,10 @@ export function useAuth() {
       });
 
       const data = await response.json();
+      console.log('[useAuth] Login API response:', { ok: response.ok, status: response.status, data });
 
       if (response.ok) {
+        console.log('[useAuth] ✓ Login successful, updating state');
         setAuthState({
           authenticated: true,
           userType: data.userType,
@@ -73,6 +76,7 @@ export function useAuth() {
         });
         return { success: true };
       } else {
+        console.log('[useAuth] ✗ Login failed:', data.error);
         return { success: false, error: data.error || 'Login failed' };
       }
     } catch (error) {

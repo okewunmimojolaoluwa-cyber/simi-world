@@ -46,12 +46,12 @@ export default function AdminGestureLogin({
   }, [clickCount]);
 
   const handleTextClick = (e?: React.MouseEvent | React.TouchEvent) => {
-    console.log('[AdminGestureLogin] Click detected!', clickCount + 1);
     const newCount = clickCount + 1;
+    console.log('[AdminGestureLogin] Click detected!', newCount, 'of 5');
     setClickCount(newCount);
 
     if (newCount === 5) {
-      console.log('[AdminGestureLogin] 5 clicks reached! Showing prompt...');
+      console.log('[AdminGestureLogin] ✓ 5 clicks reached! Showing admin prompt...');
       setShowPrompt(true);
       setClickCount(0);
     }
@@ -61,19 +61,24 @@ export default function AdminGestureLogin({
     e.preventDefault();
     
     if (!password) {
+      console.log('[AdminGestureLogin] ✗ No password entered');
       setError('Please enter admin password');
       return;
     }
 
+    console.log('[AdminGestureLogin] Attempting admin login...');
     setLoading(true);
     setError('');
 
     const result = await onAdminLogin(password);
+    console.log('[AdminGestureLogin] Login result:', result);
 
     if (result.success) {
+      console.log('[AdminGestureLogin] ✓ Login successful! Calling onAuthenticated...');
       setShowPrompt(false);
       onAuthenticated();
     } else {
+      console.log('[AdminGestureLogin] ✗ Login failed:', result.error);
       setError(result.error || 'Incorrect admin password');
       setPassword('');
       setLoading(false);
@@ -91,25 +96,37 @@ export default function AdminGestureLogin({
     <>
       {/* Clickable wrapper for the birthday text */}
       <span
-        onClick={handleTextClick}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          console.log('[AdminGestureLogin] Click detected on span!');
+          handleTextClick(e);
+        }}
         onTouchEnd={(e) => {
           e.preventDefault();
           e.stopPropagation();
+          console.log('[AdminGestureLogin] Touch detected on span!');
           handleTextClick(e);
         }}
+        onMouseEnter={() => console.log('[AdminGestureLogin] Mouse entered clickable area')}
         style={{ 
           cursor: 'pointer',
           userSelect: 'none',
           WebkitTapHighlightColor: 'transparent',
           position: 'relative',
-          zIndex: 100,
+          zIndex: 1000,
           display: 'inline-block',
+          pointerEvents: 'auto',
+          transition: 'opacity 0.2s ease',
         }}
+        onMouseOver={(e) => (e.currentTarget.style.opacity = '0.8')}
+        onMouseOut={(e) => (e.currentTarget.style.opacity = '1')}
         role="button"
         tabIndex={0}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
+            console.log('[AdminGestureLogin] Keyboard interaction!');
             handleTextClick();
           }
         }}
