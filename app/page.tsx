@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useUniverse } from '@/hooks/useUniverse';
 import { useAuth } from '@/hooks/useAuth';
@@ -9,10 +9,16 @@ import BirthdayGiftIntro from '@/components/universe/BirthdayGiftIntro';
 import SimiPasswordGate from '@/components/auth/SimiPasswordGate';
 
 // Dynamically import WorldRoom with no SSR to prevent Three.js build issues
-const WorldRoom = dynamic(() => import('@/components/world/WorldRoom'), {
-  ssr: false,
-  loading: () => <LoadingScreen />,
-});
+const WorldRoom = dynamic(
+  () => import('@/components/world/WorldRoom').catch((err) => {
+    console.error('Failed to load WorldRoom:', err);
+    return { default: () => <div>Loading world...</div> };
+  }),
+  {
+    ssr: false,
+    loading: () => <LoadingScreen />,
+  }
+);
 
 export default function Universe() {
   const { state, isLoading, updateState } = useUniverse();
@@ -74,15 +80,44 @@ export default function Universe() {
   if (authenticated && !authLoading) {
     return (
       <main className="fixed inset-0 overflow-clip">
-        <WorldRoom
-          state={state}
-          updateState={updateState}
-          onReplayIntro={handleReplayIntro}
-        />
+        <ErrorBoundary fallback={<LoadingScreen />}>
+          <WorldRoom
+            state={state}
+            updateState={updateState}
+            onReplayIntro={handleReplayIntro}
+          />
+        </ErrorBoundary>
       </main>
     );
   }
 
   // Loading state
   return <LoadingScreen />;
+}
+
+// Simple Error Boundary Component
+class ErrorBoundary extends React.Component<
+  { children: React.ReactNode; fallback: React.ReactNode },
+  { hasError: boolean; error: Error | null }
+> {
+  constructor(props: { children: React.ReactNode; fallback: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('WorldRoom Error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      console.error('Error caught by boundary:', this.state.error);
+      return this.props.fallback;
+    }
+    return this.props.children;
+  }
 }

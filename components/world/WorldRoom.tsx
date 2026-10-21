@@ -6,7 +6,7 @@ import WorldSidebar from './WorldSidebar';
 import RoomObject from './RoomObject';
 import WorldInfoPanel from './WorldInfoPanel';
 import { WORLD } from '@/data/world';
-import { UniverseState, isBirthday } from '@/lib/persistence';
+import { UniverseState, isBirthday, unlockAchievement, checkTimeBasedAchievements, exploreArea } from '@/lib/persistence';
 
 // Import existing feature components
 import MiniGameArcade from '@/components/universe/MiniGameArcade';
@@ -67,14 +67,12 @@ export default function WorldRoom({ state, updateState, onReplayIntro }: WorldRo
       
       // Unlock birthday achievement
       if (typeof window !== 'undefined') {
-        const { unlockAchievement } = require('@/lib/persistence');
         unlockAchievement('birthday-girl');
       }
     }
     
     // Check time-based achievements
     if (typeof window !== 'undefined') {
-      const { checkTimeBasedAchievements } = require('@/lib/persistence');
       checkTimeBasedAchievements();
     }
   }, [state, updateState]);
@@ -84,7 +82,6 @@ export default function WorldRoom({ state, updateState, onReplayIntro }: WorldRo
     
     // Track area exploration for achievements
     if (typeof window !== 'undefined') {
-      const { exploreArea } = require('@/lib/persistence');
       exploreArea(view);
     }
   };
