@@ -19,24 +19,22 @@ export default function Universe() {
   const { authenticated, userType, loading: authLoading, login } = useAuth();
   const [isReplaying, setIsReplaying] = useState(false);
   const [showPasswordGate, setShowPasswordGate] = useState(false);
+  const [introCompleted, setIntroCompleted] = useState(false);
 
   // Only wait for universe state to load, not auth
   if (isLoading || !state) {
     return <LoadingScreen />;
   }
 
-  // IMPORTANT: ALWAYS show intro on page load/refresh
-  // Remove the birthdayIntroCompleted check to force intro every time
-  const shouldShowBirthdayIntro = true; // Always show intro, ignore saved state
-
   const handleUnlockBirthday = () => {
-    // Don't save completion state - we want intro to show every time
-    setIsReplaying(false);
-    // Show password gate after intro completion
+    // Mark intro as completed and show password gate
+    setIntroCompleted(true);
     setShowPasswordGate(true);
+    setIsReplaying(false);
   };
 
   const handleReplayIntro = () => {
+    setIntroCompleted(false);
     setIsReplaying(true);
   };
 
@@ -48,8 +46,8 @@ export default function Universe() {
     setShowPasswordGate(false);
   };
 
-  // Show birthday intro first
-  if (shouldShowBirthdayIntro) {
+  // Show birthday intro first (only if not completed yet)
+  if (!introCompleted || isReplaying) {
     return (
       <main className="fixed inset-0 overflow-clip">
         <BirthdayGiftIntro
@@ -61,7 +59,7 @@ export default function Universe() {
   }
 
   // Show password gate after intro (before dashboard)
-  if (showPasswordGate) {
+  if (showPasswordGate || !authenticated) {
     return (
       <main className="fixed inset-0 overflow-clip">
         <SimiPasswordGate
@@ -72,8 +70,8 @@ export default function Universe() {
     );
   }
 
-  // Show dashboard only when authenticated (or if auth is still loading, wait)
-  if (!authLoading && authenticated) {
+  // Show dashboard only when authenticated
+  if (authenticated && !authLoading) {
     return (
       <main className="fixed inset-0 overflow-clip">
         <WorldRoom
@@ -85,13 +83,6 @@ export default function Universe() {
     );
   }
 
-  // If auth is loading or not authenticated, show password gate
-  return (
-    <main className="fixed inset-0 overflow-clip">
-      <SimiPasswordGate
-        onAuthenticated={handleAuthenticated}
-        onLogin={handleSimiLogin}
-      />
-    </main>
-  );
+  // Loading state
+  return <LoadingScreen />;
 }
