@@ -27,8 +27,21 @@ export default function Universe() {
   const [showPasswordGate, setShowPasswordGate] = useState(false);
   const [introCompleted, setIntroCompleted] = useState(false);
 
+  // Debug logging
+  useEffect(() => {
+    console.log('[Universe] State:', { 
+      stateExists: !!state, 
+      isLoading, 
+      authenticated, 
+      authLoading,
+      introCompleted,
+      showPasswordGate 
+    });
+  }, [state, isLoading, authenticated, authLoading, introCompleted, showPasswordGate]);
+
   // Only wait for universe state to load, not auth
   if (isLoading || !state) {
+    console.log('[Universe] Loading state or waiting for state...');
     return <LoadingScreen />;
   }
 
@@ -78,9 +91,26 @@ export default function Universe() {
 
   // Show dashboard only when authenticated
   if (authenticated && !authLoading) {
+    console.log('[Universe] Rendering WorldRoom with state:', state);
+    
+    // Safety check - ensure state exists
+    if (!state) {
+      console.error('[Universe] State is null when trying to render WorldRoom!');
+      return <LoadingScreen />;
+    }
+
     return (
       <main className="fixed inset-0 overflow-clip">
-        <ErrorBoundary fallback={<LoadingScreen />}>
+        <ErrorBoundary 
+          fallback={
+            <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-gray-900 to-black text-white">
+              <div className="text-center p-8">
+                <h2 className="text-2xl font-bold mb-4">Loading Your World...</h2>
+                <p className="text-gray-400">Setting up the experience</p>
+              </div>
+            </div>
+          }
+        >
           <WorldRoom
             state={state}
             updateState={updateState}
@@ -92,6 +122,7 @@ export default function Universe() {
   }
 
   // Loading state
+  console.log('[Universe] Showing loading screen (auth not ready)');
   return <LoadingScreen />;
 }
 
@@ -106,16 +137,18 @@ class ErrorBoundary extends React.Component<
   }
 
   static getDerivedStateFromError(error: Error) {
+    console.error('[ErrorBoundary] Error caught:', error);
     return { hasError: true, error };
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('WorldRoom Error:', error, errorInfo);
+    console.error('[ErrorBoundary] WorldRoom Error:', error);
+    console.error('[ErrorBoundary] Error Info:', errorInfo);
   }
 
   render() {
     if (this.state.hasError) {
-      console.error('Error caught by boundary:', this.state.error);
+      console.error('[ErrorBoundary] Rendering fallback due to error:', this.state.error);
       return this.props.fallback;
     }
     return this.props.children;
