@@ -100,6 +100,52 @@ CREATE TABLE IF NOT EXISTS pet_state (
   updated_at  TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- ── Login Events ──────────────────────────────────────────────────
+-- Tracks all login attempts for security and analytics
+CREATE TABLE IF NOT EXISTS login_events (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_type         TEXT NOT NULL CHECK (user_type IN ('simi', 'admin')),
+  status            TEXT NOT NULL CHECK (status IN ('success', 'failed', 'rate_limited')),
+  login_timestamp   TIMESTAMPTZ DEFAULT NOW(),
+  ip_address        TEXT,
+  user_agent        TEXT,
+  created_at        TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Index for faster queries
+CREATE INDEX IF NOT EXISTS idx_login_events_timestamp 
+  ON login_events(login_timestamp DESC);
+CREATE INDEX IF NOT EXISTS idx_login_events_user_type 
+  ON login_events(user_type);
+CREATE INDEX IF NOT EXISTS idx_login_events_status 
+  ON login_events(status);
+
+-- ── Media Library ─────────────────────────────────────────────────
+-- Stores photos, videos, and music for the experience
+CREATE TABLE IF NOT EXISTS media_library (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  media_type      TEXT NOT NULL CHECK (media_type IN ('photo', 'video', 'music')),
+  title           TEXT NOT NULL,
+  caption         TEXT,
+  artist          TEXT,  -- For music tracks
+  storage_path    TEXT NOT NULL,  -- Path in Supabase Storage
+  storage_bucket  TEXT NOT NULL DEFAULT 'media',
+  content_type    TEXT NOT NULL,  -- MIME type
+  file_size       BIGINT NOT NULL,  -- Size in bytes
+  sort_order      INTEGER DEFAULT 0,  -- For manual ordering
+  is_featured     BOOLEAN DEFAULT FALSE,
+  created_at      TIMESTAMPTZ DEFAULT NOW(),
+  updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Indexes for faster queries
+CREATE INDEX IF NOT EXISTS idx_media_library_type 
+  ON media_library(media_type);
+CREATE INDEX IF NOT EXISTS idx_media_library_featured 
+  ON media_library(is_featured) WHERE is_featured = TRUE;
+CREATE INDEX IF NOT EXISTS idx_media_library_sort 
+  ON media_library(sort_order);
+
 -- ── Auto-update timestamps ────────────────────────────────────────
 CREATE OR REPLACE FUNCTION update_updated_at()
 RETURNS TRIGGER AS $$
@@ -117,6 +163,10 @@ CREATE TRIGGER pet_state_updated_at
   BEFORE UPDATE ON pet_state
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
+CREATE TRIGGER media_library_updated_at
+  BEFORE UPDATE ON media_library
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
 -- ── Insert default rows ───────────────────────────────────────────
 -- These will be upserted on first load, so safe to run multiple times
 INSERT INTO universe_state (id) VALUES ('roqeebat')
@@ -130,6 +180,8 @@ INSERT INTO pet_state (id) VALUES ('olajuwon')
 -- In production you'd lock this down further with auth.uid() checks
 ALTER TABLE universe_state ENABLE ROW LEVEL SECURITY;
 ALTER TABLE pet_state ENABLE ROW LEVEL SECURITY;
+ALTER TABLE login_events ENABLE ROW LEVEL SECURITY;
+ALTER TABLE media_library ENABLE ROW LEVEL SECURITY;
 
 -- Allow all operations for now (single-user birthday app)
 CREATE POLICY "Allow all on universe_state" ON universe_state
@@ -137,3 +189,39 @@ CREATE POLICY "Allow all on universe_state" ON universe_state
 
 CREATE POLICY "Allow all on pet_state" ON pet_state
   FOR ALL USING (true) WITH CHECK (true);
+
+CREATE POLICY "Allow all on login_events" ON login_events
+  FOR ALL USING (true) WITH CHECK (true);
+
+CREATE POLICY "Allow all on media_library" ON media_library
+  FOR ALL USING (true) WITH CHECK (true);
+
+-- ══════════════════════════════════════════════════════════════════
+-- STORAGE BUCKETS
+-- Run these commands in Supabase Dashboard > Storage
+-- ══════════════════════════════════════════════════════════════════
+
+-- Create a 'media' bucket for photos, videos, and music
+-- Then set it to PUBLIC so files can be accessed without auth
+
+/*
+1. Go to Supabase Dashboard > Storage
+2. Click "New bucket"
+3. Name: media
+4. Public bucket: YES
+5. Click "Create bucket"
+
+6. Click on the "media" bucket
+7. Go to "Policies" tab
+8. Add policy:
+   - Policy name: "Allow public read access"
+   - SELECT operation
+   - Target roles: anon, authenticated
+   - USING expression: true
+   
+9. Add another policy:
+   - Policy name: "Allow authenticated users to upload"
+   - INSERT operation  
+   - Target roles: authenticated
+   - WITH CHECK expression: true
+*/
