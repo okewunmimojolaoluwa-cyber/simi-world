@@ -11,12 +11,57 @@ import SimiPasswordGate from '@/components/auth/SimiPasswordGate';
 // Dynamically import WorldRoom with no SSR to prevent Three.js build issues
 const WorldRoom = dynamic(
   () => import('@/components/world/WorldRoom').catch((err) => {
-    console.error('Failed to load WorldRoom:', err);
-    return { default: () => <div>Loading world...</div> };
+    console.error('[CRITICAL] Failed to load WorldRoom module:', err);
+    // Return a fallback component instead of crashing
+    return { 
+      default: () => (
+        <div style={{ 
+          position: 'fixed', 
+          inset: 0, 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          background: 'linear-gradient(135deg, #1a0f1e 0%, #2d1b3d 100%)',
+          color: '#fff',
+          fontFamily: 'system-ui, sans-serif',
+          padding: '20px'
+        }}>
+          <div style={{ textAlign: 'center', maxWidth: 500 }}>
+            <h2 style={{ fontSize: 24, fontWeight: 'bold', marginBottom: 16, color: '#ff6b9d' }}>
+              ⚠️ WorldRoom Failed to Load
+            </h2>
+            <p style={{ color: '#c4b5fd', marginBottom: 16 }}>
+              The 3D world component could not be loaded. This might be a Three.js or WebGL issue.
+            </p>
+            <p style={{ color: '#9ca3af', fontSize: 14, marginBottom: 16 }}>
+              Error: {err.message || 'Unknown module error'}
+            </p>
+            <button 
+              onClick={() => window.location.reload()} 
+              style={{ 
+                padding: '12px 24px', 
+                background: '#c4b5fd', 
+                color: '#1a0f1e', 
+                border: 'none', 
+                borderRadius: 8, 
+                cursor: 'pointer',
+                fontSize: 16,
+                fontWeight: 600
+              }}
+            >
+              Reload Page
+            </button>
+          </div>
+        </div>
+      )
+    };
   }),
   {
     ssr: false,
-    loading: () => <LoadingScreen />,
+    loading: () => {
+      console.log('[WorldRoom] Loading component...');
+      return <LoadingScreen />;
+    },
   }
 );
 
@@ -26,6 +71,91 @@ export default function Universe() {
   const [isReplaying, setIsReplaying] = useState(false);
   const [showPasswordGate, setShowPasswordGate] = useState(false);
   const [introCompleted, setIntroCompleted] = useState(false);
+  const [globalError, setGlobalError] = useState<Error | null>(null);
+
+  // Global error handler
+  useEffect(() => {
+    const handleError = (event: ErrorEvent) => {
+      console.error('[GLOBAL ERROR]', event.error);
+      setGlobalError(event.error);
+      event.preventDefault(); // Prevent default error handling
+    };
+
+    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      console.error('[UNHANDLED PROMISE REJECTION]', event.reason);
+      setGlobalError(new Error(`Promise rejection: ${event.reason}`));
+      event.preventDefault();
+    };
+
+    window.addEventListener('error', handleError);
+    window.addEventListener('unhandledrejection', handleUnhandledRejection);
+
+    return () => {
+      window.removeEventListener('error', handleError);
+      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+    };
+  }, []);
+
+  // Show global error if caught
+  if (globalError) {
+    return (
+      <main className="fixed inset-0 overflow-clip">
+        <div style={{ 
+          position: 'fixed', 
+          inset: 0, 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          background: 'linear-gradient(135deg, #1a0f1e 0%, #2d1b3d 100%)',
+          color: '#fff',
+          fontFamily: 'system-ui, sans-serif',
+          padding: '20px'
+        }}>
+          <div style={{ textAlign: 'center', maxWidth: 600 }}>
+            <h2 style={{ fontSize: 28, fontWeight: 'bold', marginBottom: 16, color: '#ff6b9d' }}>
+              ⚠️ Application Error
+            </h2>
+            <p style={{ color: '#c4b5fd', fontSize: 16, marginBottom: 16 }}>
+              An unexpected error occurred
+            </p>
+            <div style={{ 
+              textAlign: 'left', 
+              background: 'rgba(0,0,0,0.3)', 
+              padding: 16, 
+              borderRadius: 8,
+              marginBottom: 16,
+              maxHeight: 200,
+              overflow: 'auto'
+            }}>
+              <div style={{ fontSize: 12, color: '#ffd700', fontFamily: 'monospace', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                {globalError.message}
+                {globalError.stack && (
+                  <pre style={{ marginTop: 8, fontSize: 11, color: '#e0e0e0' }}>
+                    {globalError.stack.split('\n').slice(0, 10).join('\n')}
+                  </pre>
+                )}
+              </div>
+            </div>
+            <button 
+              onClick={() => window.location.reload()} 
+              style={{ 
+                padding: '12px 24px', 
+                background: '#c4b5fd', 
+                color: '#1a0f1e', 
+                border: 'none', 
+                borderRadius: 8, 
+                cursor: 'pointer',
+                fontSize: 16,
+                fontWeight: 600
+              }}
+            >
+              Reload Page
+            </button>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   // Debug logging
   useEffect(() => {
@@ -118,7 +248,10 @@ export default function Universe() {
               <h2 style={{ fontSize: 28, fontWeight: 'bold', marginBottom: 16 }}>⚠️ State Error</h2>
               <p style={{ color: '#c4b5fd', fontSize: 16 }}>Unable to load your universe data</p>
               <button 
-                onClick={() => window.location.reload()} 
+                onClick={() => {
+                  localStorage.clear();
+                  window.location.reload();
+                }} 
                 style={{ 
                   marginTop: 24, 
                   padding: '12px 24px', 
@@ -131,7 +264,7 @@ export default function Universe() {
                   fontWeight: 600
                 }}
               >
-                Reload Page
+                Clear Cache & Reload
               </button>
             </div>
           </div>
@@ -140,6 +273,44 @@ export default function Universe() {
     }
 
     console.log('[Universe] 🎨 About to render WorldRoom component...');
+    
+    // TEMPORARY TEST: Show a simple test UI instead of WorldRoom
+    // This will help us identify if the issue is with WorldRoom or authentication
+    const TEST_MODE = false; // Set to true to enable test mode
+    
+    if (TEST_MODE) {
+      return (
+        <main className="fixed inset-0 overflow-clip" style={{
+          background: 'linear-gradient(135deg, #1a0f1e 0%, #2d1b3d 100%)',
+          color: '#fff',
+          padding: '40px',
+          fontFamily: 'system-ui, sans-serif'
+        }}>
+          <h1 style={{ fontSize: 32, marginBottom: 20 }}>🎉 Test Mode - Authentication Working!</h1>
+          <p style={{ marginBottom: 20, color: '#c4b5fd' }}>If you see this, authentication is working. The issue is with WorldRoom.</p>
+          <div style={{ background: 'rgba(0,0,0,0.3)', padding: 20, borderRadius: 8 }}>
+            <h2 style={{ fontSize: 20, marginBottom: 10 }}>State Info:</h2>
+            <pre style={{ fontSize: 12, overflow: 'auto' }}>{JSON.stringify(state, null, 2)}</pre>
+          </div>
+          <button 
+            onClick={() => window.location.reload()} 
+            style={{ 
+              marginTop: 20, 
+              padding: '12px 24px', 
+              background: '#c4b5fd', 
+              color: '#1a0f1e', 
+              border: 'none', 
+              borderRadius: 8, 
+              cursor: 'pointer',
+              fontSize: 16,
+              fontWeight: 600
+            }}
+          >
+            Reload
+          </button>
+        </main>
+      );
+    }
     
     return (
       <main className="fixed inset-0 overflow-clip">
@@ -154,7 +325,10 @@ export default function Universe() {
               background: 'linear-gradient(135deg, #1a0f1e 0%, #2d1b3d 100%)',
               color: '#fff'
             }}>
-              <LoadingScreen />
+              <div style={{ textAlign: 'center' }}>
+                <h2 style={{ fontSize: 24, marginBottom: 10 }}>Loading Your World...</h2>
+                <p style={{ color: '#c4b5fd' }}>Please wait</p>
+              </div>
             </div>
           }>
             <WorldRoom
