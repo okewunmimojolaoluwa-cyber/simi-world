@@ -9,11 +9,16 @@ import { motion } from 'framer-motion';
 
 interface LoginEvent {
   id: string;
-  role: 'simi' | 'admin';
-  success: boolean;
+  user_type: 'simi' | 'admin';
+  status: 'success' | 'failed' | 'rate_limited';
+  login_timestamp: string;
   ip_address: string | null;
   user_agent: string | null;
   created_at: string;
+  // Formatted Lagos timezone fields (added by API)
+  lagos_date?: string;
+  lagos_time?: string;
+  lagos_datetime?: string;
 }
 
 export default function LoginHistory() {
@@ -57,12 +62,16 @@ export default function LoginHistory() {
     });
   };
 
-  const getRoleColor = (role: string) => {
-    return role === 'admin' ? 'text-purple-400' : 'text-pink-400';
+  const getRoleColor = (userType: string) => {
+    return userType === 'admin' ? 'text-purple-400' : 'text-pink-400';
   };
 
-  const getRoleBadge = (role: string) => {
-    return role === 'admin' ? '🔑 Admin' : '👤 Simi';
+  const getRoleBadge = (userType: string) => {
+    return userType === 'admin' ? '🔑 Admin' : '👤 Simi';
+  };
+
+  const isSuccess = (status: string) => {
+    return status === 'success';
   };
 
   if (loading) {
@@ -102,13 +111,13 @@ export default function LoginHistory() {
         </div>
         <div className="bg-gradient-to-br from-green-500/10 to-green-600/5 border border-green-400/30 rounded-xl p-4">
           <div className="text-green-400 text-2xl font-bold">
-            {events.filter(e => e.success).length}
+            {events.filter(e => e.status === 'success').length}
           </div>
           <div className="text-gray-400 text-sm mt-1">Successful</div>
         </div>
         <div className="bg-gradient-to-br from-red-500/10 to-red-600/5 border border-red-400/30 rounded-xl p-4">
           <div className="text-red-400 text-2xl font-bold">
-            {events.filter(e => !e.success).length}
+            {events.filter(e => e.status === 'failed').length}
           </div>
           <div className="text-gray-400 text-sm mt-1">Failed</div>
         </div>
@@ -130,7 +139,7 @@ export default function LoginHistory() {
               transition={{ delay: index * 0.05 }}
               className={`
                 bg-gray-800/30 border rounded-xl p-4
-                ${event.success 
+                ${isSuccess(event.status) 
                   ? 'border-gray-700/30 hover:border-gray-600/30' 
                   : 'border-red-400/20 hover:border-red-400/30'
                 }
@@ -140,19 +149,19 @@ export default function LoginHistory() {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex items-start gap-3">
                   <div className="text-2xl mt-1">
-                    {event.success ? '✅' : '❌'}
+                    {isSuccess(event.status) ? '✅' : event.status === 'rate_limited' ? '⏱️' : '❌'}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className={`font-medium ${getRoleColor(event.role)}`}>
-                        {getRoleBadge(event.role)}
+                      <span className={`font-medium ${getRoleColor(event.user_type)}`}>
+                        {getRoleBadge(event.user_type)}
                       </span>
                       <span className="text-gray-500 text-sm">
-                        {event.success ? 'logged in' : 'failed to login'}
+                        {event.status === 'success' ? 'logged in' : event.status === 'rate_limited' ? 'rate limited' : 'failed to login'}
                       </span>
                     </div>
                     <div className="text-gray-400 text-sm">
-                      {formatDate(event.created_at)}
+                      {event.lagos_datetime || formatDate(event.login_timestamp)}
                     </div>
                     {event.ip_address && (
                       <div className="text-gray-500 text-xs mt-1 font-mono truncate">
