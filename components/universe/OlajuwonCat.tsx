@@ -172,7 +172,7 @@ export default function OlajuwonCat({
   };
 
   // Action-based motion
-  const actionMotion: Record<string, object> = {
+  const actionMotion: Record<string, any> = {
     idle:    { y: [0, -4, 0], rotate: [0, 0.5, -0.5, 0] },
     sit:     { y: [0, -2, 0] },
     walk:    { x: [0, 3, -3, 0], y: [0, -3, 0] },
