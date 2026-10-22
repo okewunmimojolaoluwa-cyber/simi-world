@@ -1,27 +1,137 @@
 /**
  * Supabase Storage utilities for media file management
  * Handles uploads, deletions, and URL generation
+ * Now with automatic format conversion and optimization
  */
 
 import { supabaseAdmin } from './auth';
 
 const STORAGE_BUCKET = 'media';
-const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
+const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB (increased for raw uploads)
 
-// Allowed MIME types
-const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm', 'video/quicktime'];
-const ALLOWED_AUDIO_TYPES = ['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/ogg', 'audio/mp4'];
+// Accept ANY image/video/audio format - we'll convert as needed
+const IMAGE_MIME_PREFIXES = ['image/'];
+const VIDEO_MIME_PREFIXES = ['video/'];
+const AUDIO_MIME_PREFIXES = ['audio/'];
+
+// Common file extensions to detect type if MIME is missing
+const IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.tiff', '.tif', '.svg', '.heic', '.heif', '.avif', '.jfif'];
+const VIDEO_EXTENSIONS = ['.mp4', '.webm', '.mov', '.avi', '.mkv', '.flv', '.wmv', '.m4v', '.3gp', '.ogv'];
+const AUDIO_EXTENSIONS = ['.mp3', '.wav', '.ogg', '.m4a', '.aac', '.flac', '.wma', '.opus', '.webm'];
 
 export interface UploadResult {
   success: boolean;
   storagePath?: string;
   publicUrl?: string;
   error?: string;
+  optimized?: boolean;
+  originalSize?: number;
+  finalSize?: number;
 }
 
 /**
- * Validate file before upload
+ * Detect media type from file
+ */
+function detectMediaType(file: File): 'photo' | 'video' | 'music' | null {
+  const fileName = file.name.toLowerCase();
+  const mimeType = file.type.toLowerCase();
+
+  // Check by MIME type first
+  if (IMAGE_MIME_PREFIXES.some(prefix => mimeType.startsWith(prefix))) {
+    return 'photo';
+  }
+  if (VIDEO_MIME_PREFIXES.some(prefix => mimeType.startsWith(prefix))) {
+    return 'video';
+  }
+  if (AUDIO_MIME_PREFIXES.some(prefix => mimeType.startsWith(prefix))) {
+    return 'music';
+  }
+
+  // Fallback to extension detection
+  if (IMAGE_EXTENSIONS.some(ext => fileName.endsWith(ext))) {
+    return 'photo';
+  }
+  if (VIDEO_EXTENSIONS.some(ext => fileName.endsWith(ext))) {
+    return 'video';
+  }
+  if (AUDIO_EXTENSIONS.some(ext => fileName.endsWith(ext))) {
+    return 'music';
+  }
+
+  return null;
+}
+
+/**
+ * Optimize and resize image in browser
+ * Converts any format to WebP and resizes to max 1920x1080
+ */
+async function optimizeImage(file: File): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+      img.src = e.target?.result as string;
+    };
+
+    img.onload = () => {
+      // Calculate new dimensions (max 1920x1080, maintain aspect ratio)
+      let width = img.width;
+      let height = img.height;
+      const MAX_WIDTH = 1920;
+      const MAX_HEIGHT = 1080;
+
+      if (width > MAX_WIDTH || height > MAX_HEIGHT) {
+        const ratio = Math.min(MAX_WIDTH / width, MAX_HEIGHT / height);
+        width = Math.round(width * ratio);
+        height = Math.round(height * ratio);
+      }
+
+      // Create canvas and draw resized image
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      
+      if (!ctx) {
+        reject(new Error('Failed to get canvas context'));
+        return;
+      }
+
+      // Enable image smoothing for better quality
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      
+      ctx.drawImage(img, 0, 0, width, height);
+
+      // Convert to WebP with good quality (0.85 = 85% quality)
+      canvas.toBlob(
+        (blob) => {
+          if (blob) {
+            resolve(blob);
+          } else {
+            reject(new Error('Failed to convert image'));
+          }
+        },
+        'image/webp',
+        0.85
+      );
+    };
+
+    img.onerror = () => {
+      reject(new Error('Failed to load image'));
+    };
+
+    reader.onerror = () => {
+      reject(new Error('Failed to read file'));
+    };
+
+    reader.readAsDataURL(file);
+  });
+}
+
+/**
+ * Validate file before upload - NOW ACCEPTS ANY FORMAT
  */
 export function validateFile(
   file: File,
@@ -35,51 +145,57 @@ export function validateFile(
     };
   }
 
-  // Check MIME type
-  let allowedTypes: string[];
-  switch (mediaType) {
-    case 'photo':
-      allowedTypes = ALLOWED_IMAGE_TYPES;
-      break;
-    case 'video':
-      allowedTypes = ALLOWED_VIDEO_TYPES;
-      break;
-    case 'music':
-      allowedTypes = ALLOWED_AUDIO_TYPES;
-      break;
-    default:
-      return { valid: false, error: 'Invalid media type' };
-  }
-
-  if (!allowedTypes.includes(file.type)) {
+  // Auto-detect type if not specified
+  const detectedType = detectMediaType(file);
+  
+  if (!detectedType) {
     return {
       valid: false,
-      error: `Invalid file type. Allowed: ${allowedTypes.join(', ')}`,
+      error: 'Unable to detect file type. Please ensure it\'s an image, video, or audio file.',
     };
   }
 
+  // Verify detected type matches requested type
+  if (detectedType !== mediaType) {
+    return {
+      valid: false,
+      error: `File appears to be a ${detectedType}, but ${mediaType} was expected`,
+    };
+  }
+
+  // All checks passed!
   return { valid: true };
 }
 
 /**
- * Generate unique storage path
+ * Generate unique storage path with proper extension
  */
 export function generateStoragePath(
   mediaType: 'photo' | 'video' | 'music',
-  filename: string
+  filename: string,
+  optimized: boolean = false
 ): string {
   const timestamp = Date.now();
   const randomStr = Math.random().toString(36).substring(2, 8);
   const sanitizedFilename = filename.replace(/[^a-zA-Z0-9.-]/g, '_');
-  return `${mediaType}s/${timestamp}_${randomStr}_${sanitizedFilename}`;
+  
+  // If optimized, change extension to webp for images
+  let finalFilename = sanitizedFilename;
+  if (optimized && mediaType === 'photo') {
+    const nameWithoutExt = sanitizedFilename.replace(/\.[^/.]+$/, '');
+    finalFilename = `${nameWithoutExt}.webp`;
+  }
+  
+  return `${mediaType}s/${timestamp}_${randomStr}_${finalFilename}`;
 }
 
 /**
- * Upload file to Supabase Storage
+ * Upload file to Supabase Storage with automatic optimization
  */
 export async function uploadFile(
   file: File,
-  storagePath: string
+  storagePath: string,
+  autoOptimize: boolean = true
 ): Promise<UploadResult> {
   if (!supabaseAdmin) {
     return {
@@ -89,14 +205,33 @@ export async function uploadFile(
   }
 
   try {
-    // Convert File to ArrayBuffer
-    const arrayBuffer = await file.arrayBuffer();
+    const originalSize = file.size;
+    let fileToUpload: File | Blob = file;
+    let contentType = file.type;
+    let optimized = false;
+
+    // Auto-optimize images (convert to WebP and resize)
+    if (autoOptimize && file.type.startsWith('image/')) {
+      try {
+        const optimizedBlob = await optimizeImage(file);
+        fileToUpload = optimizedBlob;
+        contentType = 'image/webp';
+        optimized = true;
+        console.log(`[storage] Optimized image: ${originalSize} → ${optimizedBlob.size} bytes (${Math.round((1 - optimizedBlob.size / originalSize) * 100)}% reduction)`);
+      } catch (optimizeError) {
+        console.warn('[storage] Image optimization failed, uploading original:', optimizeError);
+        // Continue with original file if optimization fails
+      }
+    }
+
+    // Convert to ArrayBuffer
+    const arrayBuffer = await fileToUpload.arrayBuffer();
     const buffer = new Uint8Array(arrayBuffer);
 
     const { data, error } = await supabaseAdmin.storage
       .from(STORAGE_BUCKET)
       .upload(storagePath, buffer, {
-        contentType: file.type,
+        contentType: contentType || 'application/octet-stream',
         upsert: false,
       });
 
@@ -117,6 +252,9 @@ export async function uploadFile(
       success: true,
       storagePath: data.path,
       publicUrl: urlData.publicUrl,
+      optimized,
+      originalSize,
+      finalSize: fileToUpload.size,
     };
   } catch (error: any) {
     console.error('[storage] Upload exception:', error);

@@ -52,22 +52,12 @@ export default function MediaUploader({ onUploadComplete }: MediaUploaderProps) 
     setSuccess('');
     setProgress(0);
 
-    // Validate file type
     const file = files[0];
-    const validTypes = {
-      photo: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
-      video: ['video/mp4', 'video/webm', 'video/quicktime'],
-      music: ['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/ogg'],
-    };
-
-    if (!validTypes[mediaType].includes(file.type)) {
-      setError(`Please select a valid ${mediaType} file`);
-      return;
-    }
-
-    // Validate file size (50MB max)
-    if (file.size > 50 * 1024 * 1024) {
-      setError('File size must be less than 50MB');
+    
+    // Basic validation - just check size
+    const MAX_SIZE = 100 * 1024 * 1024; // 100MB
+    if (file.size > MAX_SIZE) {
+      setError('File size must be less than 100MB');
       return;
     }
 
@@ -99,7 +89,16 @@ export default function MediaUploader({ onUploadComplete }: MediaUploaderProps) 
         throw new Error(data.error || 'Upload failed');
       }
 
-      setSuccess(`${mediaType.charAt(0).toUpperCase() + mediaType.slice(1)} uploaded successfully!`);
+      const result = await response.json();
+      
+      // Show optimization info if applicable
+      if (result.optimized) {
+        const reduction = Math.round((1 - result.finalSize / result.originalSize) * 100);
+        setSuccess(`${mediaType.charAt(0).toUpperCase() + mediaType.slice(1)} uploaded & optimized! (${reduction}% smaller)`);
+      } else {
+        setSuccess(`${mediaType.charAt(0).toUpperCase() + mediaType.slice(1)} uploaded successfully!`);
+      }
+      
       setCaption('');
       
       // Reset file input
@@ -112,7 +111,7 @@ export default function MediaUploader({ onUploadComplete }: MediaUploaderProps) 
         setSuccess('');
         setProgress(0);
         onUploadComplete();
-      }, 2000);
+      }, 3000);
 
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Upload failed');
@@ -213,10 +212,15 @@ export default function MediaUploader({ onUploadComplete }: MediaUploaderProps) 
               Click to browse or drag & drop
             </p>
             <p className="text-gray-500 text-sm">
-              {mediaType === 'photo' && 'JPG, PNG, GIF, WEBP up to 50MB'}
-              {mediaType === 'video' && 'MP4, WEBM, MOV up to 50MB'}
-              {mediaType === 'music' && 'MP3, WAV, OGG up to 50MB'}
+              {mediaType === 'photo' && 'Any image format • Auto-optimized to WebP • Max 100MB'}
+              {mediaType === 'video' && 'Any video format • Max 100MB'}
+              {mediaType === 'music' && 'Any audio format • Max 100MB'}
             </p>
+            {mediaType === 'photo' && (
+              <p className="text-yellow-400/70 text-xs mt-1">
+                ✨ Images auto-resized to 1920x1080 & converted to WebP
+              </p>
+            )}
           </>
         )}
       </div>
@@ -230,7 +234,7 @@ export default function MediaUploader({ onUploadComplete }: MediaUploaderProps) 
             exit={{ opacity: 0 }}
             className="bg-red-500/10 border border-red-400/30 rounded-lg p-3 text-red-300 text-sm"
           >
-            {error}
+            ❌ {error}
           </motion.div>
         )}
         {success && (
@@ -240,7 +244,7 @@ export default function MediaUploader({ onUploadComplete }: MediaUploaderProps) 
             exit={{ opacity: 0 }}
             className="bg-green-500/10 border border-green-400/30 rounded-lg p-3 text-green-300 text-sm"
           >
-            {success}
+            ✅ {success}
           </motion.div>
         )}
       </AnimatePresence>

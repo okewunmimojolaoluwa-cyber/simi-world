@@ -77,11 +77,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Generate storage path
-    const storagePath = generateStoragePath(mediaType, file.name);
+    // Check if this is an image that will be optimized
+    const isImage = file.type.startsWith('image/');
+    
+    // Generate storage path (with .webp extension for images)
+    const storagePath = generateStoragePath(mediaType, file.name, isImage);
 
-    // Upload file
-    const uploadResult: UploadResult = await uploadFile(file, storagePath);
+    // Upload file with auto-optimization
+    const uploadResult: UploadResult = await uploadFile(file, storagePath, true);
 
     if (!uploadResult.success) {
       return NextResponse.json(
@@ -100,8 +103,8 @@ export async function POST(request: NextRequest) {
         artist: artist || null,
         storage_path: uploadResult.storagePath,
         storage_bucket: 'media',
-        content_type: file.type,
-        file_size: file.size,
+        content_type: uploadResult.optimized ? 'image/webp' : file.type,
+        file_size: uploadResult.finalSize || file.size,
         sort_order: sortOrder ? parseInt(sortOrder, 10) : 0,
       })
       .select()
@@ -121,6 +124,9 @@ export async function POST(request: NextRequest) {
         ...mediaEntry,
         publicUrl: uploadResult.publicUrl,
       },
+      optimized: uploadResult.optimized,
+      originalSize: uploadResult.originalSize,
+      finalSize: uploadResult.finalSize,
     });
   } catch (error: any) {
     if (error.message === 'Unauthorized') {
