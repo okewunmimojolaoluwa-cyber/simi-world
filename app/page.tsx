@@ -73,7 +73,7 @@ export default function Universe() {
   const [introCompleted, setIntroCompleted] = useState(false);
   const [globalError, setGlobalError] = useState<Error | null>(null);
 
-  // Global error handler
+  // Global error handler - MUST BE BEFORE ANY CONDITIONAL RETURNS
   useEffect(() => {
     const handleError = (event: ErrorEvent) => {
       console.error('[GLOBAL ERROR]', event.error);
@@ -96,6 +96,20 @@ export default function Universe() {
     };
   }, []);
 
+  // Debug logging - MUST BE BEFORE ANY CONDITIONAL RETURNS
+  useEffect(() => {
+    console.log('[Universe] State:', { 
+      stateExists: !!state, 
+      isLoading, 
+      authenticated, 
+      authLoading,
+      introCompleted,
+      showPasswordGate 
+    });
+  }, [state, isLoading, authenticated, authLoading, introCompleted, showPasswordGate]);
+
+  // NOW safe to do conditional returns (all hooks are called above)
+  
   // Show global error if caught
   if (globalError) {
     return (
@@ -156,18 +170,6 @@ export default function Universe() {
       </main>
     );
   }
-
-  // Debug logging
-  useEffect(() => {
-    console.log('[Universe] State:', { 
-      stateExists: !!state, 
-      isLoading, 
-      authenticated, 
-      authLoading,
-      introCompleted,
-      showPasswordGate 
-    });
-  }, [state, isLoading, authenticated, authLoading, introCompleted, showPasswordGate]);
 
   // Only wait for universe state to load, not auth
   if (isLoading || !state) {
