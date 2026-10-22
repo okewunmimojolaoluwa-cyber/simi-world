@@ -91,11 +91,17 @@ export default function Universe() {
 
   // Show dashboard only when authenticated
   if (authenticated && !authLoading) {
-    console.log('[Universe] Rendering WorldRoom with state:', state);
+    console.log('[Universe] ✅ Authenticated! Preparing to render WorldRoom');
+    console.log('[Universe] State details:', {
+      hasState: !!state,
+      stateKeys: state ? Object.keys(state) : [],
+      totalVisits: state?.totalVisits,
+      selectedMood: state?.selectedMood
+    });
     
     // Safety check - ensure state exists
     if (!state) {
-      console.error('[Universe] State is null when trying to render WorldRoom!');
+      console.error('[Universe] ❌ State is null when trying to render WorldRoom!');
       return (
         <main className="fixed inset-0 overflow-clip">
           <div style={{ 
@@ -133,14 +139,30 @@ export default function Universe() {
       );
     }
 
+    console.log('[Universe] 🎨 About to render WorldRoom component...');
+    
     return (
       <main className="fixed inset-0 overflow-clip">
         <ErrorBoundary>
-          <WorldRoom
-            state={state}
-            updateState={updateState}
-            onReplayIntro={handleReplayIntro}
-          />
+          <React.Suspense fallback={
+            <div style={{ 
+              position: 'fixed', 
+              inset: 0, 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              background: 'linear-gradient(135deg, #1a0f1e 0%, #2d1b3d 100%)',
+              color: '#fff'
+            }}>
+              <LoadingScreen />
+            </div>
+          }>
+            <WorldRoom
+              state={state}
+              updateState={updateState}
+              onReplayIntro={handleReplayIntro}
+            />
+          </React.Suspense>
         </ErrorBoundary>
       </main>
     );
@@ -174,6 +196,9 @@ class ErrorBoundary extends React.Component<
   render() {
     if (this.state.hasError) {
       console.error('[ErrorBoundary] Rendering fallback due to error:', this.state.error);
+      const errorMessage = this.state.error?.message || 'Unknown error';
+      const errorStack = this.state.error?.stack?.split('\n').slice(0, 5).join('\n') || '';
+      
       return (
         <div style={{ 
           position: 'fixed', 
@@ -183,12 +208,44 @@ class ErrorBoundary extends React.Component<
           justifyContent: 'center', 
           background: 'linear-gradient(135deg, #1a0f1e 0%, #2d1b3d 100%)',
           color: '#fff',
-          fontFamily: 'system-ui, sans-serif'
+          fontFamily: 'system-ui, sans-serif',
+          padding: '20px'
         }}>
-          <div style={{ textAlign: 'center', padding: 32 }}>
-            <h2 style={{ fontSize: 28, fontWeight: 'bold', marginBottom: 16 }}>✨ Loading Your World...</h2>
-            <p style={{ color: '#c4b5fd', fontSize: 16 }}>Setting up your experience</p>
-            <p style={{ color: '#9ca3af', fontSize: 14, marginTop: 12 }}>If this takes too long, try refreshing the page</p>
+          <div style={{ textAlign: 'center', padding: 32, maxWidth: 600 }}>
+            <h2 style={{ fontSize: 28, fontWeight: 'bold', marginBottom: 16, color: '#ff6b9d' }}>⚠️ Error Loading World</h2>
+            <p style={{ color: '#c4b5fd', fontSize: 16, marginBottom: 16 }}>Something went wrong while loading your dashboard</p>
+            <details style={{ 
+              textAlign: 'left', 
+              background: 'rgba(0,0,0,0.3)', 
+              padding: 16, 
+              borderRadius: 8,
+              marginBottom: 16,
+              cursor: 'pointer'
+            }}>
+              <summary style={{ color: '#ffd700', marginBottom: 8 }}>Error Details (click to expand)</summary>
+              <div style={{ fontSize: 12, color: '#e0e0e0', fontFamily: 'monospace' }}>
+                <strong>Error:</strong> {errorMessage}
+                <pre style={{ marginTop: 8, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{errorStack}</pre>
+              </div>
+            </details>
+            <p style={{ color: '#9ca3af', fontSize: 14, marginBottom: 16 }}>
+              Try refreshing the page. If the problem persists, check the browser console (F12) for more details.
+            </p>
+            <button 
+              onClick={() => window.location.reload()} 
+              style={{ 
+                padding: '12px 24px', 
+                background: '#c4b5fd', 
+                color: '#1a0f1e', 
+                border: 'none', 
+                borderRadius: 8, 
+                cursor: 'pointer',
+                fontSize: 16,
+                fontWeight: 600
+              }}
+            >
+              Reload Page
+            </button>
           </div>
         </div>
       );
