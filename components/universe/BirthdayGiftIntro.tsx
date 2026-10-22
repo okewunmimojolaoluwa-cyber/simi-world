@@ -293,7 +293,7 @@ export default function BirthdayGiftIntro({ onUnlock }: BirthdayGiftIntroProps) 
                   transition={{ duration: 35, repeat: Infinity, ease: 'linear' }}
                   style={{ position: 'absolute', inset: -6, borderRadius: '50%', border: '1px dotted rgba(255,107,157,0.25)', pointerEvents: 'none' }}
                 />
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 'clamp(10px, 3vw, 14px)', background: 'linear-gradient(135deg, rgba(255,215,0,0.22), rgba(255,140,0,0.18), rgba(255,107,157,0.15))', border: '1.5px solid rgba(255,215,0,0.65)', borderRadius: 100, padding: 'clamp(10px, 2.5vw, 12px) clamp(18px, 5vw, 28px)', backdropFilter: 'blur(16px)', boxShadow: '0 12px 40px rgba(255,215,0,0.3), 0 0 60px rgba(255,107,157,0.15), inset 0 1px 0 rgba(255,255,255,0.2)' }}>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 'clamp(10px, 3vw, 14px)', background: 'linear-gradient(135deg, rgba(255,215,0,0.22), rgba(255,140,0,0.18), rgba(255,107,157,0.15))', border: '1.5px solid rgba(255,215,0,0.65)', borderRadius: 100, padding: 'clamp(10px, 2.5vw, 12px) clamp(18px, 5vw, 28px)', backdropFilter: isMobile ? 'none' : 'blur(16px)', boxShadow: '0 12px 40px rgba(255,215,0,0.3), 0 0 60px rgba(255,107,157,0.15), inset 0 1px 0 rgba(255,255,255,0.2)' }}>
                   <motion.span animate={{ scale: [1, 1.5, 1], rotate: [0, 360] }} transition={{ duration: 2.5, repeat: Infinity }} style={{ fontSize: 'clamp(16px, 4vw, 18px)' }}>🎂</motion.span>
                   <AdminGestureLogin
                     targetText={
@@ -433,7 +433,7 @@ export default function BirthdayGiftIntro({ onUnlock }: BirthdayGiftIntroProps) 
                     </motion.div>
 
                     {/* Enhanced sparkle effects - More dynamic */}
-                    {[...Array(12)].map((_, i) => (
+                    {[...Array(sparkleCount)].map((_, i) => (
                       <motion.div
                         key={i}
                         animate={{ 
@@ -479,7 +479,7 @@ export default function BirthdayGiftIntro({ onUnlock }: BirthdayGiftIntroProps) 
                   </div>
 
                   {/* Orbiting stars around the gift */}
-                  {[...Array(6)].map((_, i) => (
+                  {[...Array(orbitStarCount)].map((_, i) => (
                     <motion.div
                       key={`orbit-${i}`}
                       animate={{ rotate: [0, 360] }}
@@ -720,7 +720,7 @@ export default function BirthdayGiftIntro({ onUnlock }: BirthdayGiftIntroProps) 
                       : 'linear-gradient(145deg, rgba(30,20,50,0.9), rgba(14,11,8,0.95))',
                     border: `1px solid ${discoveredMonth ? 'rgba(212,175,55,0.45)' : 'rgba(255,255,255,0.08)'}`,
                     boxShadow: discoveredMonth ? '0 0 40px rgba(212,175,55,0.12)' : '0 8px 32px rgba(0,0,0,0.5)',
-                    backdropFilter: 'blur(20px)',
+                    backdropFilter: isMobile ? 'none' : 'blur(20px)',
                     transition: 'background 0.4s, border-color 0.4s, box-shadow 0.4s',
                   }}
                 >
@@ -845,7 +845,7 @@ export default function BirthdayGiftIntro({ onUnlock }: BirthdayGiftIntroProps) 
           <motion.div
             key="drawer-modal"
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(0,0,0,0.88)', backdropFilter: 'blur(16px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'clamp(12px,4vw,24px)' }}
+            style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(0,0,0,0.88)', backdropFilter: isMobile ? 'none' : 'blur(16px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'clamp(12px,4vw,24px)' }}
           >
             <motion.div
               initial={{ scale: 0.9, y: 30 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 30 }}
@@ -893,7 +893,7 @@ export default function BirthdayGiftIntro({ onUnlock }: BirthdayGiftIntroProps) 
           <motion.div
             key="musicbox-modal"
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(0,0,0,0.88)', backdropFilter: 'blur(16px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'clamp(12px,4vw,24px)' }}
+            style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(0,0,0,0.88)', backdropFilter: isMobile ? 'none' : 'blur(16px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'clamp(12px,4vw,24px)' }}
           >
             <motion.div
               initial={{ scale: 0.9, y: 30 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 30 }}
@@ -972,7 +972,7 @@ export default function BirthdayGiftIntro({ onUnlock }: BirthdayGiftIntroProps) 
           <motion.div
             key="gift-modal"
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(0,0,0,0.88)', backdropFilter: 'blur(16px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'clamp(12px,4vw,24px)' }}
+            style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(0,0,0,0.88)', backdropFilter: isMobile ? 'none' : 'blur(16px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'clamp(12px,4vw,24px)' }}
           >
             <motion.div
               initial={{ scale: 0.9, y: 30 }}
