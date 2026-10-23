@@ -93,9 +93,13 @@ export default function SunshineManager() {
       <div className="bg-gradient-to-br from-yellow-500/5 to-pink-500/5 border border-yellow-400/20 rounded-xl p-4 sm:p-6">
         <h2 className="text-xl font-bold text-yellow-400 mb-4 flex items-center gap-2">
           <span>📤</span>
-          <span>Upload Media</span>
+          <span>Upload Photos & Videos</span>
         </h2>
-        <MediaUploader onUploadComplete={handleUploadComplete} />
+        <MediaUploader 
+          onUploadComplete={handleUploadComplete}
+          allowedTypes={['photo', 'video']}
+          defaultType="photo"
+        />
       </div>
 
       {/* Type Toggle */}

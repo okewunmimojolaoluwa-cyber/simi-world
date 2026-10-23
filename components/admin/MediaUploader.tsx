@@ -9,15 +9,21 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 interface MediaUploaderProps {
   onUploadComplete: () => void;
+  allowedTypes?: ('photo' | 'video' | 'music')[];
+  defaultType?: 'photo' | 'video' | 'music';
 }
 
-export default function MediaUploader({ onUploadComplete }: MediaUploaderProps) {
+export default function MediaUploader({ 
+  onUploadComplete,
+  allowedTypes = ['photo', 'video', 'music'],
+  defaultType = 'photo'
+}: MediaUploaderProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [mediaType, setMediaType] = useState<'photo' | 'video' | 'music'>('photo');
+  const [mediaType, setMediaType] = useState<'photo' | 'video' | 'music'>(defaultType);
   const [caption, setCaption] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -124,28 +130,30 @@ export default function MediaUploader({ onUploadComplete }: MediaUploaderProps) 
   return (
     <div className="space-y-4">
       {/* Media Type Selector */}
-      <div className="flex gap-2">
-        {(['photo', 'video', 'music'] as const).map((type) => (
-          <button
-            key={type}
-            onClick={() => setMediaType(type)}
-            disabled={uploading}
-            className={`
-              flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all
-              ${mediaType === type
-                ? 'bg-yellow-500/20 border border-yellow-400/50 text-yellow-300'
-                : 'bg-gray-700/30 border border-gray-600/30 text-gray-400 hover:text-gray-300'
-              }
-              disabled:opacity-50 disabled:cursor-not-allowed
-            `}
-          >
-            {type === 'photo' && '📷'} 
-            {type === 'video' && '🎥'} 
-            {type === 'music' && '🎵'} 
-            {' '}{type.charAt(0).toUpperCase() + type.slice(1)}
-          </button>
-        ))}
-      </div>
+      {allowedTypes.length > 1 && (
+        <div className="flex gap-2">
+          {allowedTypes.map((type) => (
+            <button
+              key={type}
+              onClick={() => setMediaType(type)}
+              disabled={uploading}
+              className={`
+                flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all
+                ${mediaType === type
+                  ? 'bg-yellow-500/20 border border-yellow-400/50 text-yellow-300'
+                  : 'bg-gray-700/30 border border-gray-600/30 text-gray-400 hover:text-gray-300'
+                }
+                disabled:opacity-50 disabled:cursor-not-allowed
+              `}
+            >
+              {type === 'photo' && '📷'} 
+              {type === 'video' && '🎥'} 
+              {type === 'music' && '🎵'} 
+              {' '}{type.charAt(0).toUpperCase() + type.slice(1)}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Caption Input */}
       <input

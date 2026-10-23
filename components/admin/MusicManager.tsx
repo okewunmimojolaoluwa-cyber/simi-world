@@ -94,7 +94,11 @@ export default function MusicManager() {
           <span>📤</span>
           <span>Upload Music</span>
         </h2>
-        <MediaUploader onUploadComplete={handleUploadComplete} />
+        <MediaUploader 
+          onUploadComplete={handleUploadComplete}
+          allowedTypes={['music']}
+          defaultType="music"
+        />
       </div>
 
       {/* Music Library */}

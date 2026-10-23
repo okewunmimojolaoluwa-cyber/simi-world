@@ -106,19 +106,35 @@ CREATE TABLE IF NOT EXISTS login_events (
   id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_type         TEXT NOT NULL CHECK (user_type IN ('simi', 'admin')),
   status            TEXT NOT NULL CHECK (status IN ('success', 'failed', 'rate_limited')),
+  session_id        TEXT,  -- Session identifier for tracking
   login_timestamp   TIMESTAMPTZ DEFAULT NOW(),
   ip_address        TEXT,
   user_agent        TEXT,
   created_at        TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Index for faster queries
+-- Indexes for faster queries
 CREATE INDEX IF NOT EXISTS idx_login_events_timestamp 
   ON login_events(login_timestamp DESC);
 CREATE INDEX IF NOT EXISTS idx_login_events_user_type 
   ON login_events(user_type);
 CREATE INDEX IF NOT EXISTS idx_login_events_status 
   ON login_events(status);
+
+-- ── Failed Login Attempts ─────────────────────────────────────────
+-- Tracks failed attempts for rate limiting (blocks after 5 in 15 min)
+CREATE TABLE IF NOT EXISTS failed_login_attempts (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_type         TEXT NOT NULL CHECK (user_type IN ('simi', 'admin')),
+  ip_address        TEXT NOT NULL,
+  attempt_timestamp TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Indexes for rate limit checks
+CREATE INDEX IF NOT EXISTS idx_failed_attempts_timestamp 
+  ON failed_login_attempts(attempt_timestamp DESC);
+CREATE INDEX IF NOT EXISTS idx_failed_attempts_ip 
+  ON failed_login_attempts(ip_address, user_type);
 
 -- ── Media Library ─────────────────────────────────────────────────
 -- Stores photos, videos, and music for the experience
@@ -181,6 +197,7 @@ INSERT INTO pet_state (id) VALUES ('olajuwon')
 ALTER TABLE universe_state ENABLE ROW LEVEL SECURITY;
 ALTER TABLE pet_state ENABLE ROW LEVEL SECURITY;
 ALTER TABLE login_events ENABLE ROW LEVEL SECURITY;
+ALTER TABLE failed_login_attempts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE media_library ENABLE ROW LEVEL SECURITY;
 
 -- Allow all operations for now (single-user birthday app)
@@ -191,6 +208,9 @@ CREATE POLICY "Allow all on pet_state" ON pet_state
   FOR ALL USING (true) WITH CHECK (true);
 
 CREATE POLICY "Allow all on login_events" ON login_events
+  FOR ALL USING (true) WITH CHECK (true);
+
+CREATE POLICY "Allow all on failed_login_attempts" ON failed_login_attempts
   FOR ALL USING (true) WITH CHECK (true);
 
 CREATE POLICY "Allow all on media_library" ON media_library
