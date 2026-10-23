@@ -7,6 +7,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import MediaUploader from './MediaUploader';
+import { WORLD } from '@/data/world';
 
 interface MediaItem {
   id: string;
@@ -15,6 +16,7 @@ interface MediaItem {
   caption: string | null;
   order_index: number;
   created_at: string;
+  source?: 'database' | 'hardcoded'; // Track source
 }
 
 export default function SunshineManager() {
@@ -34,6 +36,7 @@ export default function SunshineManager() {
       setLoading(true);
       setError('');
       
+      // Fetch database media
       const [photosRes, videosRes] = await Promise.all([
         fetch('/api/media?type=photo'),
         fetch('/api/media?type=video'),
@@ -46,8 +49,32 @@ export default function SunshineManager() {
       const photosData = await photosRes.json();
       const videosData = await videosRes.json();
       
-      setPhotos(photosData.media || []);
-      setVideos(videosData.media || []);
+      // Get hardcoded photos from WORLD data
+      const hardcodedPhotos: MediaItem[] = [];
+      if (WORLD.memoryMuseum?.exhibitions) {
+        WORLD.memoryMuseum.exhibitions.forEach((exhibition, exhibitionIndex) => {
+          exhibition.photos.forEach((photo, photoIndex) => {
+            hardcodedPhotos.push({
+              id: `hardcoded-photo-${exhibition.id}-${photo.id}`,
+              type: 'photo',
+              url: photo.url,
+              caption: `${exhibition.title} - ${photo.caption}`,
+              order_index: exhibitionIndex * 100 + photoIndex,
+              created_at: new Date(2024, 0, 1).toISOString(), // Fixed date for hardcoded
+              source: 'hardcoded',
+            });
+          });
+        });
+      }
+      
+      // Combine database and hardcoded photos
+      const allPhotos = [
+        ...hardcodedPhotos,
+        ...(photosData.media || []).map((m: any) => ({ ...m, source: 'database' }))
+      ];
+      
+      setPhotos(allPhotos);
+      setVideos((videosData.media || []).map((m: any) => ({ ...m, source: 'database' })));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load media');
     } finally {
@@ -55,7 +82,13 @@ export default function SunshineManager() {
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: string, source?: string) => {
+    // Can't delete hardcoded media
+    if (source === 'hardcoded') {
+      alert('Cannot delete hardcoded media. These are part of the experience design.');
+      return;
+    }
+
     if (!confirm('Are you sure you want to delete this item?')) {
       return;
     }
@@ -183,6 +216,13 @@ export default function SunshineManager() {
                     />
                   )}
                   
+                  {/* Source Badge */}
+                  {item.source === 'hardcoded' && (
+                    <div className="absolute top-2 left-2 px-2 py-1 bg-blue-500/80 backdrop-blur-sm text-white text-xs font-medium rounded">
+                      Built-in
+                    </div>
+                  )}
+                  
                   {/* Overlay Actions */}
                   <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                     <button
@@ -191,13 +231,15 @@ export default function SunshineManager() {
                     >
                       View
                     </button>
-                    <button
-                      onClick={() => handleDelete(item.id)}
-                      disabled={deletingId === item.id}
-                      className="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {deletingId === item.id ? 'Deleting...' : 'Delete'}
-                    </button>
+                    {item.source !== 'hardcoded' && (
+                      <button
+                        onClick={() => handleDelete(item.id, item.source)}
+                        disabled={deletingId === item.id}
+                        className="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {deletingId === item.id ? 'Deleting...' : 'Delete'}
+                      </button>
+                    )}
                   </div>
                 </div>
 

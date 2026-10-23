@@ -8,6 +8,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import MediaUploader from './MediaUploader';
+import { WORLD } from '@/data/world';
 
 interface MusicTrack {
   id: string;
@@ -15,6 +16,9 @@ interface MusicTrack {
   caption: string | null;
   order_index: number;
   created_at: string;
+  source?: 'database' | 'hardcoded'; // Track source
+  title?: string;
+  artist?: string;
 }
 
 export default function MusicManager() {
@@ -33,6 +37,7 @@ export default function MusicManager() {
       setLoading(true);
       setError('');
       
+      // Fetch database music
       const response = await fetch('/api/media?type=music');
       
       if (!response.ok) {
@@ -40,7 +45,31 @@ export default function MusicManager() {
       }
       
       const data = await response.json();
-      setTracks(data.media || []);
+      
+      // Get hardcoded music from WORLD data
+      const hardcodedMusic: MusicTrack[] = [];
+      if (WORLD.music?.playlist) {
+        WORLD.music.playlist.forEach((track, index) => {
+          hardcodedMusic.push({
+            id: `hardcoded-music-${track.id}`,
+            url: track.url,
+            caption: null,
+            title: track.title,
+            artist: track.artist,
+            order_index: index,
+            created_at: new Date(2024, 0, 1).toISOString(),
+            source: 'hardcoded',
+          });
+        });
+      }
+      
+      // Combine hardcoded and database music
+      const allTracks = [
+        ...hardcodedMusic,
+        ...(data.media || []).map((m: any) => ({ ...m, source: 'database' }))
+      ];
+      
+      setTracks(allTracks);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load music');
     } finally {
@@ -48,7 +77,13 @@ export default function MusicManager() {
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: string, source?: string) => {
+    // Can't delete hardcoded music
+    if (source === 'hardcoded') {
+      alert('Cannot delete built-in music tracks. These are part of the experience.');
+      return;
+    }
+
     if (!confirm('Are you sure you want to delete this track?')) {
       return;
     }
@@ -79,11 +114,16 @@ export default function MusicManager() {
     loadMusic();
   };
 
-  const getTrackName = (url: string, caption: string | null) => {
-    if (caption) return caption;
-    const parts = url.split('/');
+  const getTrackName = (track: MusicTrack) => {
+    if (track.title) return track.title;
+    if (track.caption) return track.caption;
+    const parts = track.url.split('/');
     const filename = parts[parts.length - 1];
     return decodeURIComponent(filename.replace(/\.[^/.]+$/, ''));
+  };
+
+  const getTrackArtist = (track: MusicTrack) => {
+    return track.artist || 'Unknown Artist';
   };
 
   return (
@@ -151,11 +191,18 @@ export default function MusicManager() {
                         {playingId === track.id ? '🎶' : '🎵'}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-white font-medium text-sm sm:text-base truncate">
-                          {getTrackName(track.url, track.caption)}
-                        </h3>
-                        <p className="text-gray-500 text-xs sm:text-sm">
-                          {new Date(track.created_at).toLocaleDateString()}
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="text-white font-medium text-sm sm:text-base truncate">
+                            {getTrackName(track)}
+                          </h3>
+                          {track.source === 'hardcoded' && (
+                            <span className="px-2 py-0.5 bg-blue-500/80 text-white text-xs font-medium rounded shrink-0">
+                              Built-in
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-gray-500 text-xs sm:text-sm truncate">
+                          {getTrackArtist(track)} • {new Date(track.created_at).toLocaleDateString()}
                         </p>
                       </div>
                     </div>
@@ -185,13 +232,15 @@ export default function MusicManager() {
                       >
                         Download
                       </a>
-                      <button
-                        onClick={() => handleDelete(track.id)}
-                        disabled={deletingId === track.id}
-                        className="flex-1 sm:flex-initial px-3 py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-300 rounded-lg text-xs sm:text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        {deletingId === track.id ? 'Deleting...' : 'Delete'}
-                      </button>
+                      {track.source !== 'hardcoded' && (
+                        <button
+                          onClick={() => handleDelete(track.id, track.source)}
+                          disabled={deletingId === track.id}
+                          className="flex-1 sm:flex-initial px-3 py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-300 rounded-lg text-xs sm:text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {deletingId === track.id ? 'Deleting...' : 'Delete'}
+                        </button>
+                      )}
                     </div>
                   </div>
                 </motion.div>
