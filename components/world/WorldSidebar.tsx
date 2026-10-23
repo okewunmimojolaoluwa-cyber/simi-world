@@ -213,6 +213,27 @@ export default function WorldSidebar({ currentView, onNavigate, onReplayIntro }:
           </div>
         )}
 
+        {/* Logout Button */}
+        <div className="px-3 pb-3 pt-0">
+          <motion.button
+            onClick={async () => {
+              try {
+                await fetch('/api/auth/logout', { method: 'POST' });
+                window.location.href = '/';
+              } catch (error) {
+                console.error('Logout failed:', error);
+                window.location.href = '/';
+              }
+            }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-red-300 bg-red-500/10 hover:bg-red-500/20 border border-red-400/30 shadow-sm transition-all cursor-pointer"
+          >
+            <span>🚪</span>
+            <span>Logout</span>
+          </motion.button>
+        </div>
+
         <div className="flex items-center gap-2 px-4 py-3.5 border-t border-[#c4b5fd]/15 bg-black/25">
           <span className="text-sm text-[#a78bfa] animate-pulse">♡</span>
           <span className="text-[9.5px] font-bold uppercase tracking-widest text-[#c4b5fd]/90">made with love</span>
@@ -394,6 +415,26 @@ export default function WorldSidebar({ currentView, onNavigate, onReplayIntro }:
                   </motion.button>
                 </div>
               )}
+
+              {/* Mobile Logout Button */}
+              <div className="px-4 pb-2 pt-0">
+                <motion.button
+                  onClick={async () => {
+                    try {
+                      await fetch('/api/auth/logout', { method: 'POST' });
+                      window.location.href = '/';
+                    } catch (error) {
+                      console.error('Logout failed:', error);
+                      window.location.href = '/';
+                    }
+                  }}
+                  whileTap={{ scale: 0.96 }}
+                  className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold text-red-300 bg-red-500/10 border border-red-400/30 shadow-sm transition-all cursor-pointer"
+                >
+                  <span>🚪</span>
+                  <span>Logout</span>
+                </motion.button>
+              </div>
 
               {/* Drawer Bottom Footer */}
               <div className="p-4 border-t border-[#c4b5fd]/20 bg-black/35">
