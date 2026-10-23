@@ -309,9 +309,17 @@ export const WORLD = {
   music: {
     enabled: true,
     playlist: [
-      { id: 1, title: "Song 1", artist: "Artist 1", url: "/audio/song1.mp3" },
-      { id: 2, title: "Song 2", artist: "Artist 2", url: "/audio/song2.mp3" },
-      { id: 3, title: "Song 3", artist: "Artist 3", url: "/audio/song3.mp3" }
+      { id: 1, title: "Who's Dat Girl", artist: "Ayra Starr Ft Rema", url: "/audio/Ayra_Starr_Ft_Rema_Whos_Dat_Girl_2621_AllNaijaMusic.mp3" },
+      { id: 2, title: "Cutesy", artist: "BNXN", url: "/audio/BNXN_Cutesy_7677_AllNaijaMusic.mp3" },
+      { id: 3, title: "Eja Meja", artist: "BNXN Ft Asake", url: "/audio/BNXN_Ft_Asake_Eja_Meja_7316_AllNaijaMusic.mp3" },
+      { id: 4, title: "Online", artist: "BNXN", url: "/audio/BNXN_Online_7945_AllNaijaMusic.mp3" },
+      { id: 5, title: "B4 B4", artist: "Davido ft Mayorkun & Fola", url: "/audio/Davido_ft_Mayorkun__Fola_B4_B4_8118_AllNaijaMusic.mp3" },
+      { id: 6, title: "It's Over", artist: "FOLA ft Bella Shmurda & Zlatan", url: "/audio/FOLA_ft_Bella_Shmurda__Zlatan_its_over_7021_AllNaijaMusic.mp3" },
+      { id: 7, title: "Soundgasm", artist: "Rema", url: "/audio/Rema_-_Soundgasm@allnaijamusic.com.mp3" },
+      { id: 8, title: "Is it a Crime", artist: "Rema", url: "/audio/Rema_Baby_Is_it_a_Crime_5821_AllNaijaMusic.mp3" },
+      { id: 9, title: "BACK 2 U", artist: "Seyi Vibez", url: "/audio/Seyi_Vibez_BACK_2_U_4041_AllNaijaMusic.mp3" },
+      { id: 10, title: "GTA", artist: "Seyi Vibez", url: "/audio/Seyi_Vibez_GTA_2452_AllNaijaMusic.mp3" },
+      { id: 11, title: "Where I'm From", artist: "TML Vibez ft Seyi Vibez", url: "/audio/TML_Vibez_ft_Seyi_Vibez_Where_Im_From_6025_AllNaijaMusic.mp3" }
     ]
   },
 
