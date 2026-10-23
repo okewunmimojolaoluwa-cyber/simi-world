@@ -60,21 +60,42 @@ export default function SunshineManager() {
               url: photo.url,
               caption: `${exhibition.title} - ${photo.caption}`,
               order_index: exhibitionIndex * 100 + photoIndex,
-              created_at: new Date(2024, 0, 1).toISOString(), // Fixed date for hardcoded
+              created_at: new Date(2024, 0, 1).toISOString(),
               source: 'hardcoded',
             });
           });
         });
       }
       
-      // Combine database and hardcoded photos
+      // Get hardcoded videos from WORLD data
+      const hardcodedVideos: MediaItem[] = [];
+      if ((WORLD as any).videoMemories) {
+        (WORLD as any).videoMemories.forEach((video: any, index: number) => {
+          hardcodedVideos.push({
+            id: `hardcoded-video-${video.id}`,
+            type: 'video',
+            url: video.url,
+            caption: video.caption,
+            order_index: index,
+            created_at: new Date(2024, 0, 1).toISOString(),
+            source: 'hardcoded',
+          });
+        });
+      }
+      
+      // Combine database and hardcoded media
       const allPhotos = [
         ...hardcodedPhotos,
-        ...(photosData.media || []).map((m: any) => ({ ...m, source: 'database' }))
+        ...(photosData.media || []).map((m: any) => ({ ...m, type: 'photo', source: 'database' }))
+      ];
+      
+      const allVideos = [
+        ...hardcodedVideos,
+        ...(videosData.media || []).map((m: any) => ({ ...m, type: 'video', source: 'database' }))
       ];
       
       setPhotos(allPhotos);
-      setVideos((videosData.media || []).map((m: any) => ({ ...m, source: 'database' })));
+      setVideos(allVideos);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load media');
     } finally {
@@ -83,12 +104,6 @@ export default function SunshineManager() {
   };
 
   const handleDelete = async (id: string, source?: string) => {
-    // Can't delete hardcoded media
-    if (source === 'hardcoded') {
-      alert('Cannot delete hardcoded media. These are part of the experience design.');
-      return;
-    }
-
     if (!confirm('Are you sure you want to delete this item?')) {
       return;
     }
@@ -96,15 +111,18 @@ export default function SunshineManager() {
     try {
       setDeletingId(id);
       
-      const response = await fetch(`/api/admin/media?id=${id}`, {
-        method: 'DELETE',
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to delete media');
+      // Only call API for database items
+      if (source !== 'hardcoded') {
+        const response = await fetch(`/api/admin/media?id=${id}`, {
+          method: 'DELETE',
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to delete media');
+        }
       }
       
-      // Remove from state
+      // Remove from state (works for both hardcoded and database)
       setPhotos(prev => prev.filter(p => p.id !== id));
       setVideos(prev => prev.filter(v => v.id !== id));
     } catch (err) {
@@ -117,6 +135,9 @@ export default function SunshineManager() {
   const handleUploadComplete = () => {
     loadMedia();
   };
+
+  // Modal state for viewing media
+  const [viewingMedia, setViewingMedia] = useState<MediaItem | null>(null);
 
   const activeItems = activeType === 'photo' ? photos : videos;
 
@@ -216,30 +237,21 @@ export default function SunshineManager() {
                     />
                   )}
                   
-                  {/* Source Badge */}
-                  {item.source === 'hardcoded' && (
-                    <div className="absolute top-2 left-2 px-2 py-1 bg-blue-500/80 backdrop-blur-sm text-white text-xs font-medium rounded">
-                      Built-in
-                    </div>
-                  )}
-                  
                   {/* Overlay Actions */}
                   <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                     <button
-                      onClick={() => window.open(item.url, '_blank')}
+                      onClick={() => setViewingMedia(item)}
                       className="px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-medium transition-colors"
                     >
                       View
                     </button>
-                    {item.source !== 'hardcoded' && (
-                      <button
-                        onClick={() => handleDelete(item.id, item.source)}
-                        disabled={deletingId === item.id}
-                        className="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        {deletingId === item.id ? 'Deleting...' : 'Delete'}
-                      </button>
-                    )}
+                    <button
+                      onClick={() => handleDelete(item.id, item.source)}
+                      disabled={deletingId === item.id}
+                      className="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {deletingId === item.id ? 'Deleting...' : 'Delete'}
+                    </button>
                   </div>
                 </div>
 
@@ -261,6 +273,60 @@ export default function SunshineManager() {
           </AnimatePresence>
         </div>
       )}
+      
+      {/* Media Viewer Modal */}
+      <AnimatePresence>
+        {viewingMedia && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setViewingMedia(null)}
+            className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative max-w-6xl w-full max-h-[90vh] bg-gray-900 rounded-xl overflow-hidden"
+            >
+              {/* Close Button */}
+              <button
+                onClick={() => setViewingMedia(null)}
+                className="absolute top-4 right-4 z-10 w-10 h-10 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center transition-colors"
+              >
+                ✕
+              </button>
+
+              {/* Media Content */}
+              <div className="w-full h-full flex items-center justify-center">
+                {viewingMedia.type === 'photo' ? (
+                  <img
+                    src={viewingMedia.url}
+                    alt={viewingMedia.caption || 'Photo'}
+                    className="max-w-full max-h-[90vh] object-contain"
+                  />
+                ) : (
+                  <video
+                    src={viewingMedia.url}
+                    controls
+                    autoPlay
+                    className="max-w-full max-h-[90vh]"
+                  />
+                )}
+              </div>
+
+              {/* Caption */}
+              {viewingMedia.caption && (
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
+                  <p className="text-white text-center">{viewingMedia.caption}</p>
+                </div>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -181,6 +181,15 @@ export const WORLD = {
   },
 
   // ═══════════════════════════════════════════════════════════
+  // VIDEO MEMORIES - Special video moments
+  // ═══════════════════════════════════════════════════════════
+  videoMemories: [
+    { id: 1, url: "/videos/video2.mp4", caption: "Beautiful moment captured" },
+    { id: 2, url: "/videos/video3.mp4", caption: "Unforgettable memories" },
+    { id: 3, url: "/videos/video4.mp4", caption: "Special times together" }
+  ],
+
+  // ═══════════════════════════════════════════════════════════
   // MOOD SYSTEM - Changes the entire world
   // ═══════════════════════════════════════════════════════════
   moods: {
