@@ -78,12 +78,6 @@ export default function MusicManager() {
   };
 
   const handleDelete = async (id: string, source?: string) => {
-    // Can't delete hardcoded music
-    if (source === 'hardcoded') {
-      alert('Cannot delete built-in music tracks. These are part of the experience.');
-      return;
-    }
-
     if (!confirm('Are you sure you want to delete this track?')) {
       return;
     }
@@ -91,14 +85,18 @@ export default function MusicManager() {
     try {
       setDeletingId(id);
       
-      const response = await fetch(`/api/admin/media?id=${id}`, {
-        method: 'DELETE',
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to delete track');
+      // Only call API for database items
+      if (source !== 'hardcoded') {
+        const response = await fetch(`/api/admin/media?id=${id}`, {
+          method: 'DELETE',
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to delete track');
+        }
       }
       
+      // Remove from state (works for both hardcoded and database)
       setTracks(prev => prev.filter(t => t.id !== id));
       if (playingId === id) {
         setPlayingId(null);
@@ -195,11 +193,6 @@ export default function MusicManager() {
                           <h3 className="text-white font-medium text-sm sm:text-base truncate">
                             {getTrackName(track)}
                           </h3>
-                          {track.source === 'hardcoded' && (
-                            <span className="px-2 py-0.5 bg-blue-500/80 text-white text-xs font-medium rounded shrink-0">
-                              Built-in
-                            </span>
-                          )}
                         </div>
                         <p className="text-gray-500 text-xs sm:text-sm truncate">
                           {getTrackArtist(track)} • {new Date(track.created_at).toLocaleDateString()}
@@ -232,15 +225,13 @@ export default function MusicManager() {
                       >
                         Download
                       </a>
-                      {track.source !== 'hardcoded' && (
-                        <button
-                          onClick={() => handleDelete(track.id, track.source)}
-                          disabled={deletingId === track.id}
-                          className="flex-1 sm:flex-initial px-3 py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-300 rounded-lg text-xs sm:text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          {deletingId === track.id ? 'Deleting...' : 'Delete'}
-                        </button>
-                      )}
+                      <button
+                        onClick={() => handleDelete(track.id, track.source)}
+                        disabled={deletingId === track.id}
+                        className="flex-1 sm:flex-initial px-3 py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-300 rounded-lg text-xs sm:text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {deletingId === track.id ? 'Deleting...' : 'Delete'}
+                      </button>
                     </div>
                   </div>
                 </motion.div>
