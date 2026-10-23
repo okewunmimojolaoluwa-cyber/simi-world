@@ -24,6 +24,7 @@ export default function DiaryViewer() {
   const [loading, setLoading] = useState(true);
   const [selectedEntry, setSelectedEntry] = useState<DiaryEntry | null>(null);
   const [showDeleted, setShowDeleted] = useState(true);
+  const [actionLoading, setActionLoading] = useState(false);
 
   useEffect(() => {
     loadEntries();
@@ -66,6 +67,56 @@ export default function DiaryViewer() {
 
   const formatFullDate = (dateString: string) => {
     return `${formatDate(dateString)} at ${formatTime(dateString)}`;
+  };
+
+  const handleRestore = async (id: string) => {
+    if (!confirm('Restore this diary entry? Simi will see it again in her diary.')) {
+      return;
+    }
+
+    try {
+      setActionLoading(true);
+      const response = await fetch('/api/admin/diary', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id }),
+      });
+
+      if (!response.ok) throw new Error('Failed to restore entry');
+
+      // Reload entries to reflect changes
+      await loadEntries();
+      setSelectedEntry(null);
+      alert('Entry restored successfully! Simi can now see it again.');
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to restore');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handlePermanentDelete = async (id: string) => {
+    if (!confirm('PERMANENTLY DELETE this entry? This cannot be undone and Simi will never see it again.')) {
+      return;
+    }
+
+    try {
+      setActionLoading(true);
+      const response = await fetch(`/api/admin/diary?id=${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) throw new Error('Failed to delete entry');
+
+      // Remove from state and close modal
+      setEntries(prev => prev.filter(e => e.id !== id));
+      setSelectedEntry(null);
+      alert('Entry permanently deleted.');
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to delete');
+    } finally {
+      setActionLoading(false);
+    }
   };
 
   const activeEntries = entries.filter(e => !e.deleted_at);
@@ -283,13 +334,37 @@ export default function DiaryViewer() {
                 </p>
               </div>
 
-              {/* Close Button */}
-              <button
-                onClick={() => setSelectedEntry(null)}
-                className="w-full py-3 bg-gray-800/50 border border-gray-700/30 text-gray-300 rounded-lg hover:bg-gray-800 transition-all"
-              >
-                Close
-              </button>
+              {/* Action Buttons */}
+              <div className="flex gap-3">
+                {selectedEntry.deleted_at ? (
+                  <>
+                    {/* Restore Button (for deleted entries) */}
+                    <button
+                      onClick={() => handleRestore(selectedEntry.id)}
+                      disabled={actionLoading}
+                      className="flex-1 py-3 bg-green-500/20 border border-green-400/30 text-green-300 rounded-lg hover:bg-green-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                    >
+                      {actionLoading ? 'Restoring...' : '♻️ Restore Entry'}
+                    </button>
+                    {/* Permanent Delete Button */}
+                    <button
+                      onClick={() => handlePermanentDelete(selectedEntry.id)}
+                      disabled={actionLoading}
+                      className="flex-1 py-3 bg-red-500/20 border border-red-400/30 text-red-300 rounded-lg hover:bg-red-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                    >
+                      {actionLoading ? 'Deleting...' : '🗑️ Delete Forever'}
+                    </button>
+                  </>
+                ) : (
+                  /* Close Button Only (for active entries) */
+                  <button
+                    onClick={() => setSelectedEntry(null)}
+                    className="flex-1 py-3 bg-gray-800/50 border border-gray-700/30 text-gray-300 rounded-lg hover:bg-gray-800 transition-all"
+                  >
+                    Close
+                  </button>
+                )}
+              </div>
             </motion.div>
           </motion.div>
         )}
