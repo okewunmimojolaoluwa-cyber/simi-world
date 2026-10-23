@@ -315,11 +315,10 @@ export const WORLD = {
       { id: 4, title: "Online", artist: "BNXN", url: "/audio/BNXN_Online_7945_AllNaijaMusic.mp3" },
       { id: 5, title: "B4 B4", artist: "Davido ft Mayorkun & Fola", url: "/audio/Davido_ft_Mayorkun__Fola_B4_B4_8118_AllNaijaMusic.mp3" },
       { id: 6, title: "It's Over", artist: "FOLA ft Bella Shmurda & Zlatan", url: "/audio/FOLA_ft_Bella_Shmurda__Zlatan_its_over_7021_AllNaijaMusic.mp3" },
-      { id: 7, title: "Soundgasm", artist: "Rema", url: "/audio/Rema_-_Soundgasm@allnaijamusic.com.mp3" },
-      { id: 8, title: "Is it a Crime", artist: "Rema", url: "/audio/Rema_Baby_Is_it_a_Crime_5821_AllNaijaMusic.mp3" },
-      { id: 9, title: "BACK 2 U", artist: "Seyi Vibez", url: "/audio/Seyi_Vibez_BACK_2_U_4041_AllNaijaMusic.mp3" },
-      { id: 10, title: "GTA", artist: "Seyi Vibez", url: "/audio/Seyi_Vibez_GTA_2452_AllNaijaMusic.mp3" },
-      { id: 11, title: "Where I'm From", artist: "TML Vibez ft Seyi Vibez", url: "/audio/TML_Vibez_ft_Seyi_Vibez_Where_Im_From_6025_AllNaijaMusic.mp3" }
+      { id: 7, title: "Is it a Crime", artist: "Rema", url: "/audio/Rema_Baby_Is_it_a_Crime_5821_AllNaijaMusic.mp3" },
+      { id: 8, title: "BACK 2 U", artist: "Seyi Vibez", url: "/audio/Seyi_Vibez_BACK_2_U_4041_AllNaijaMusic.mp3" },
+      { id: 9, title: "GTA", artist: "Seyi Vibez", url: "/audio/Seyi_Vibez_GTA_2452_AllNaijaMusic.mp3" },
+      { id: 10, title: "Where I'm From", artist: "TML Vibez ft Seyi Vibez", url: "/audio/TML_Vibez_ft_Seyi_Vibez_Where_Im_From_6025_AllNaijaMusic.mp3" }
     ]
   },
 
