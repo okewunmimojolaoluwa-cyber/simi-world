@@ -136,6 +136,24 @@ CREATE INDEX IF NOT EXISTS idx_failed_attempts_timestamp
 CREATE INDEX IF NOT EXISTS idx_failed_attempts_ip 
   ON failed_login_attempts(ip_address, user_type);
 
+-- ── Diary Entries ─────────────────────────────────────────────────
+-- Simi's private diary (but admin can secretly read everything)
+CREATE TABLE IF NOT EXISTS diary_entries (
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title        TEXT NOT NULL,
+  content      TEXT NOT NULL,
+  mood         TEXT DEFAULT '😊',
+  created_at   TIMESTAMPTZ DEFAULT NOW(),
+  updated_at   TIMESTAMPTZ DEFAULT NOW(),
+  deleted_at   TIMESTAMPTZ DEFAULT NULL  -- Soft delete: admin still sees deleted entries
+);
+
+-- Indexes for faster queries
+CREATE INDEX IF NOT EXISTS idx_diary_entries_created 
+  ON diary_entries(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_diary_entries_deleted 
+  ON diary_entries(deleted_at) WHERE deleted_at IS NULL;
+
 -- ── Media Library ─────────────────────────────────────────────────
 -- Stores photos, videos, and music for the experience
 CREATE TABLE IF NOT EXISTS media_library (
@@ -198,6 +216,7 @@ ALTER TABLE universe_state ENABLE ROW LEVEL SECURITY;
 ALTER TABLE pet_state ENABLE ROW LEVEL SECURITY;
 ALTER TABLE login_events ENABLE ROW LEVEL SECURITY;
 ALTER TABLE failed_login_attempts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE diary_entries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE media_library ENABLE ROW LEVEL SECURITY;
 
 -- Allow all operations for now (single-user birthday app)
@@ -211,6 +230,9 @@ CREATE POLICY "Allow all on login_events" ON login_events
   FOR ALL USING (true) WITH CHECK (true);
 
 CREATE POLICY "Allow all on failed_login_attempts" ON failed_login_attempts
+  FOR ALL USING (true) WITH CHECK (true);
+
+CREATE POLICY "Allow all on diary_entries" ON diary_entries
   FOR ALL USING (true) WITH CHECK (true);
 
 CREATE POLICY "Allow all on media_library" ON media_library

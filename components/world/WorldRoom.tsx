@@ -19,9 +19,10 @@ import MoodSelector from '@/components/universe/MoodSelector';
 import MusicPlayer from '@/components/universe/MusicPlayer';
 import BirthdayLetter from '@/components/universe/BirthdayLetter';
 import Achievements from '@/components/universe/Achievements';
+import DiaryEntry from '@/components/world/DiaryEntry';
 import CatIcon from './CatIcon';
 
-type View = 'home' | 'games' | 'pet' | 'daily' | 'smile' | 'openwhen' | 'memories' | 'mood' | 'random' | 'achievements' | 'music' | 'letter';
+type View = 'home' | 'diary' | 'games' | 'pet' | 'daily' | 'smile' | 'openwhen' | 'memories' | 'mood' | 'random' | 'achievements' | 'music' | 'letter';
 
 interface WorldRoomProps {
   state: UniverseState;
@@ -498,6 +499,41 @@ export default function WorldRoom({ state, updateState, onReplayIntro }: WorldRo
                   updateState={updateState}
                   onBack={handleBack}
                 />
+              </div>
+            </motion.div>
+          )}
+
+          {currentView === 'diary' && (
+            <motion.div key="diary" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="feature-view">
+              <div className="feature-view-backdrop">
+                <img src="/images/backgrounds/bg_letters.jpg" alt="" className="feature-bg-img" />
+                <div className="feature-bg-overlay" />
+              </div>
+              <div className="feature-view-inner" style={{ overflowY: 'auto' }}>
+                <motion.button 
+                  onClick={handleBack} 
+                  whileHover={{ x: -4 }}
+                  style={{ 
+                    position: 'fixed', 
+                    top: 'clamp(16px,4vw,24px)', 
+                    left: 'clamp(12px,4vw,24px)', 
+                    background: 'rgba(14,11,8,0.8)', 
+                    border: '1px solid rgba(255,255,255,0.08)', 
+                    color: '#fff', 
+                    width: 44, 
+                    height: 44, 
+                    borderRadius: '50%', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                    fontSize: 24, 
+                    zIndex: 10,
+                    backdropFilter: 'blur(8px)'
+                  }}
+                >
+                  ←
+                </motion.button>
+                <DiaryEntry />
               </div>
             </motion.div>
           )}

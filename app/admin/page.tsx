@@ -1,6 +1,6 @@
 /**
  * Admin Dashboard - Main management interface
- * Three tabs: Login History, Sunshine (Photos/Videos), Music
+ * Four tabs: Secret Diary, Login History, Sunshine (Photos/Videos), Music
  */
 
 'use client';
@@ -9,14 +9,15 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
+import DiaryViewer from '@/components/admin/DiaryViewer';
 import LoginHistory from '@/components/admin/LoginHistory';
 import SunshineManager from '@/components/admin/SunshineManager';
 import MusicManager from '@/components/admin/MusicManager';
 
-type Tab = 'history' | 'sunshine' | 'music';
+type Tab = 'diary' | 'history' | 'sunshine' | 'music';
 
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState<Tab>('history');
+  const [activeTab, setActiveTab] = useState<Tab>('diary');
   const { logout } = useAuth();
   const router = useRouter();
 
@@ -26,6 +27,7 @@ export default function AdminDashboard() {
   };
 
   const tabs: { id: Tab; label: string; icon: string }[] = [
+    { id: 'diary', label: "Simi's Diary", icon: '🤫' },
     { id: 'history', label: 'Login History', icon: '📊' },
     { id: 'sunshine', label: 'Sunshine Gallery', icon: '☀️' },
     { id: 'music', label: 'Music Library', icon: '🎵' },
@@ -93,6 +95,7 @@ export default function AdminDashboard() {
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
           >
+            {activeTab === 'diary' && <DiaryViewer />}
             {activeTab === 'history' && <LoginHistory />}
             {activeTab === 'sunshine' && <SunshineManager />}
             {activeTab === 'music' && <MusicManager />}

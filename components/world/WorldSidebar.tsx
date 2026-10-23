@@ -12,6 +12,7 @@ interface WorldSidebarProps {
 
 const NAV = [
   { id: 'home',         icon: '⌂',   label: 'Home',       desc: 'Your space'      },
+  { id: 'diary',        icon: '📖',  label: 'My Diary',   desc: 'Private thoughts' },
   { id: 'letter',       icon: '💌',  label: 'My Letter',  desc: 'From Olajuwon'   },
   { id: 'games',        icon: '◈',   label: 'Play',       desc: 'Mini games'      },
   { id: 'memories',     icon: '◫',   label: 'Sunshine 💖', desc: 'All about you'   },
