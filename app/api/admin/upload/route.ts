@@ -40,11 +40,8 @@ export async function POST(request: NextRequest) {
     // Parse multipart form data
     const formData = await request.formData();
     const file = formData.get('file') as File;
-    const mediaType = formData.get('mediaType') as 'photo' | 'video' | 'music';
-    const title = formData.get('title') as string;
+    const type = formData.get('type') as 'photo' | 'video' | 'music'; // Changed from mediaType
     const caption = formData.get('caption') as string | null;
-    const artist = formData.get('artist') as string | null;
-    const sortOrder = formData.get('sortOrder') as string | null;
 
     // Validation
     if (!file) {
@@ -54,22 +51,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!mediaType || !['photo', 'video', 'music'].includes(mediaType)) {
+    if (!type || !['photo', 'video', 'music'].includes(type)) {
       return NextResponse.json(
         { error: 'Invalid media type' },
         { status: 400 }
       );
     }
 
-    if (!title) {
-      return NextResponse.json(
-        { error: 'Title is required' },
-        { status: 400 }
-      );
-    }
+    // Generate title from filename if no caption
+    const title = caption || file.name.replace(/\.[^/.]+$/, '');
 
     // Validate file
-    const validation = validateFile(file, mediaType);
+    const validation = validateFile(file, type);
     if (!validation.valid) {
       return NextResponse.json(
         { error: validation.error },
@@ -81,7 +74,7 @@ export async function POST(request: NextRequest) {
     const isImage = file.type.startsWith('image/');
     
     // Generate storage path (with .webp extension for images)
-    const storagePath = generateStoragePath(mediaType, file.name, isImage);
+    const storagePath = generateStoragePath(type, file.name, isImage);
 
     // Upload file with auto-optimization
     const uploadResult: UploadResult = await uploadFile(file, storagePath, true);
@@ -97,15 +90,15 @@ export async function POST(request: NextRequest) {
     const { data: mediaEntry, error: dbError } = await supabaseAdmin
       .from('media_library')
       .insert({
-        media_type: mediaType,
+        media_type: type, // Changed from mediaType
         title,
         caption: caption || null,
-        artist: artist || null,
+        artist: null,
         storage_path: uploadResult.storagePath,
         storage_bucket: 'media',
         content_type: uploadResult.optimized ? 'image/webp' : file.type,
         file_size: uploadResult.finalSize || file.size,
-        sort_order: sortOrder ? parseInt(sortOrder, 10) : 0,
+        sort_order: 0,
       })
       .select()
       .single();

@@ -83,18 +83,14 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const limit = parseInt(searchParams.get('limit') || '50', 10);
     const offset = parseInt(searchParams.get('offset') || '0', 10);
-    const userType = searchParams.get('userType'); // Filter by simi/admin
 
+    // Admin only sees SIMI's logins (not their own)
     let query = supabaseAdmin
       .from('login_events')
       .select('*', { count: 'exact' })
+      .eq('user_type', 'simi') // Only Simi's logins
       .order('login_timestamp', { ascending: false })
       .range(offset, offset + limit - 1);
-
-    // Filter by user type if specified
-    if (userType === 'simi' || userType === 'admin') {
-      query = query.eq('user_type', userType);
-    }
 
     // Only show successful logins by default (can be changed)
     const statusFilter = searchParams.get('status');
