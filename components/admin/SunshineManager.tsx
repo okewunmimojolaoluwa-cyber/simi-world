@@ -222,7 +222,10 @@ export default function SunshineManager() {
                 className="group relative bg-gray-800/30 border border-gray-700/30 rounded-xl overflow-hidden hover:border-yellow-400/30 transition-all"
               >
                 {/* Media Preview */}
-                <div className="aspect-video bg-gray-900/50 relative overflow-hidden">
+                <div 
+                  className="aspect-video bg-gray-900/50 relative overflow-hidden cursor-pointer"
+                  onClick={() => setViewingMedia(item)}
+                >
                   {item.type === 'photo' ? (
                     <img
                       src={item.url}
@@ -230,23 +233,39 @@ export default function SunshineManager() {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <video
-                      src={item.url}
-                      className="w-full h-full object-cover"
-                      controls
-                    />
+                    <div className="relative w-full h-full">
+                      <video
+                        src={item.url}
+                        className="w-full h-full object-cover"
+                        preload="metadata"
+                      />
+                      {/* Play button overlay */}
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                        <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border-2 border-white/50">
+                          <svg className="w-8 h-8 text-white ml-1" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M8 5v14l11-7z" />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
                   )}
                   
                   {/* Overlay Actions */}
                   <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                     <button
-                      onClick={() => setViewingMedia(item)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setViewingMedia(item);
+                      }}
                       className="px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-medium transition-colors"
                     >
-                      View
+                      {item.type === 'video' ? 'Play' : 'View'}
                     </button>
                     <button
-                      onClick={() => handleDelete(item.id, item.source)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(item.id, item.source);
+                      }}
                       disabled={deletingId === item.id}
                       className="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >

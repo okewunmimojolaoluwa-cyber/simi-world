@@ -116,7 +116,7 @@ export default function MemoryGallery({ onBack }: MemoryGalleryProps) {
           type: 'video' as const,
           src: item.publicUrl,
           title: item.title || `Video ${index + 1}`,
-          caption: item.description || 'Special memory',
+          caption: item.description || 'A precious moment worth watching ✨',
           badge: 'UPLOADED',
         }));
 
