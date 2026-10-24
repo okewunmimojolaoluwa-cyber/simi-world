@@ -13,7 +13,7 @@ interface BirthdayGiftIntroProps {
   isReplay?: boolean;
 }
 
-type Act = 'opening' | 'room' | 'reveal' | 'transition';
+type Act = 'opening' | 'room' | 'reveal';
 type ActiveStation = null | 'drawer' | 'musicbox' | 'gift';
 
 /* ── Floating particle for ambient effect ── */
@@ -164,8 +164,8 @@ export default function BirthdayGiftIntro({ onUnlock }: BirthdayGiftIntroProps) 
 
   const handleEnterWorld = () => {
     sounds.click();
-    setAct('transition');
-    setTimeout(() => onUnlock(), 1800);
+    // Skip transition screen and go directly to password gate
+    onUnlock();
   };
 
   if (!mounted) return null;
@@ -1384,37 +1384,8 @@ export default function BirthdayGiftIntro({ onUnlock }: BirthdayGiftIntroProps) 
       </AnimatePresence>
 
       {/* ═══════════════════════════════════════════════════════════
-          ACT 04 — THE TRANSITION
+          END OF INTRO SEQUENCE
       ═══════════════════════════════════════════════════════════ */}
-      <AnimatePresence>
-        {act === 'transition' && (
-          <motion.div
-            key="act-transition"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1.2 }}
-            style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'radial-gradient(circle at 50% 50%, #ffe8a0 0%, #f9c46a 30%, #e8834a 60%, #c53b7d 100%)' }}
-          >
-            <div style={{ textAlign: 'center' }}>
-              <motion.div
-                animate={{ scale: [1, 1.15, 1], opacity: [0.9, 1, 0.9] }}
-                transition={{ duration: 1.4, repeat: Infinity }}
-                style={{ fontSize: 'clamp(40px,10vw,64px)', marginBottom: 16, filter: 'drop-shadow(0 4px 20px rgba(0,0,0,0.25))' }}
-              >
-                ✦
-              </motion.div>
-              <motion.p
-                animate={{ opacity: [0.7, 1, 0.7] }}
-                transition={{ duration: 1.8, repeat: Infinity }}
-                style={{ fontFamily: 'var(--font-poppins), sans-serif', fontSize: 'clamp(12px,3vw,15px)', fontWeight: 800, letterSpacing: '0.24em', textTransform: 'uppercase', color: '#1a0a08' }}
-              >
-                Opening Simi&apos;s World…
-              </motion.p>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
     </div>
   );
