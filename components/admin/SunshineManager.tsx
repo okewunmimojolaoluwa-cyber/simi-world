@@ -231,6 +231,9 @@ export default function SunshineManager() {
                       src={item.url}
                       alt={item.caption || 'Photo'}
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        console.error('Image load error:', item.url);
+                      }}
                     />
                   ) : (
                     <div className="relative w-full h-full bg-black">
@@ -247,10 +250,10 @@ export default function SunshineManager() {
                           console.log('Video metadata loaded:', item.url);
                         }}
                       />
-                      {/* Play button overlay */}
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/40 pointer-events-none">
-                        <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border-2 border-white/50">
-                          <svg className="w-8 h-8 text-white ml-1" viewBox="0 0 24 24" fill="currentColor">
+                      {/* Play button overlay - made more prominent */}
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+                        <div className="w-20 h-20 rounded-full bg-white/30 backdrop-blur-sm flex items-center justify-center border-3 border-white/70">
+                          <svg className="w-10 h-10 text-white ml-1" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M8 5v14l11-7z" />
                           </svg>
                         </div>
@@ -334,18 +337,36 @@ export default function SunshineManager() {
                     src={viewingMedia.url}
                     alt={viewingMedia.caption || 'Photo'}
                     className="max-w-full max-h-[90vh] object-contain"
+                    onError={(e) => {
+                      console.error('Modal image load error:', viewingMedia.url);
+                      (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" fill="white"%3EImage Failed%3C/text%3E%3C/svg%3E';
+                    }}
                   />
                 ) : (
-                  <video
-                    src={viewingMedia.url}
-                    controls
-                    autoPlay
-                    playsInline
-                    className="max-w-full max-h-[80vh] w-auto rounded-lg"
-                    style={{ backgroundColor: '#000' }}
-                  >
-                    Your browser does not support the video tag.
-                  </video>
+                  <div className="w-full max-w-4xl">
+                    <video
+                      key={viewingMedia.id}
+                      src={viewingMedia.url}
+                      controls
+                      autoPlay
+                      playsInline
+                      className="w-full max-h-[80vh] rounded-lg"
+                      style={{ backgroundColor: '#000' }}
+                      onError={(e) => {
+                        console.error('Modal video load error:', viewingMedia.url);
+                        alert(`Failed to load video. URL: ${viewingMedia.url}\n\nPlease check if the video file exists and is accessible.`);
+                      }}
+                      onLoadedData={() => {
+                        console.log('Modal video loaded successfully:', viewingMedia.url);
+                      }}
+                    >
+                      <source src={viewingMedia.url} />
+                      Your browser does not support the video tag.
+                    </video>
+                    <p className="text-center text-gray-400 text-sm mt-4">
+                      If video doesn't play, check browser console for errors
+                    </p>
+                  </div>
                 )}
               </div>
 
