@@ -220,29 +220,20 @@ export default function WorldRoom({ state, updateState, onReplayIntro, onChangeP
                 onClick={onChangePassword}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="fixed top-4 right-4 z-[100] flex items-center gap-2 px-4 py-2.5 rounded-full font-semibold text-sm shadow-lg cursor-pointer"
                 style={{
-                  position: 'fixed',
-                  top: '20px',
-                  right: '20px',
-                  zIndex: 100,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  padding: '10px 16px',
-                  background: 'linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(168, 85, 247, 0.2))',
+                  background: 'linear-gradient(135deg, rgba(236, 72, 153, 0.3), rgba(168, 85, 247, 0.3))',
                   backdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(236, 72, 153, 0.3)',
-                  borderRadius: '9999px',
-                  color: 'rgba(255, 182, 193, 0.9)',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  boxShadow: '0 4px 20px rgba(236, 72, 153, 0.3)',
+                  border: '1px solid rgba(236, 72, 153, 0.4)',
+                  color: '#ffb6c1',
+                  boxShadow: '0 4px 20px rgba(236, 72, 153, 0.4)',
                 }}
-                className="change-password-btn"
               >
-                <span style={{ fontSize: '16px' }}>🔐</span>
-                <span className="hidden sm:inline">Change Password</span>
+                <span className="text-lg">🔐</span>
+                <span>Change Password</span>
               </motion.button>
             )}
 
