@@ -133,48 +133,29 @@ export const WORLD = {
   memoryMuseum: {
     exhibitions: [
       {
-        id: "beginning",
-        title: "THE BEGINNING",
-        description: "Where it all started",
+        id: "beautiful",
+        title: "BEAUTIFUL MOMENTS",
+        description: "Stunning photos of you",
         photos: [
-          { id: 1, url: "/images/memories/beginning/1.jpg", caption: "First times" },
-          { id: 2, url: "/images/memories/beginning/2.jpg", caption: "Getting to know you" }
-        ]
-      },
-      {
-        id: "funny",
-        title: "THE FUNNY ONES",
-        description: "Moments that made us laugh",
-        photos: [
-          { id: 3, url: "/images/memories/funny/1.jpg", caption: "That face though 😂" },
-          { id: 4, url: "/images/memories/funny/2.jpg", caption: "Classic moment" }
-        ]
-      },
-      {
-        id: "pretty",
-        title: "THE PRETTY ONES",
-        description: "You looking absolutely stunning",
-        photos: [
-          { id: 5, url: "/images/memories/pretty/1.jpg", caption: "Gorgeous" },
-          { id: 6, url: "/images/memories/pretty/2.jpg", caption: "Literally perfect" }
-        ]
-      },
-      {
-        id: "chaotic",
-        title: "THE CHAOTIC ONES",
-        description: "When things got interesting",
-        photos: [
-          { id: 7, url: "/images/memories/chaotic/1.jpg", caption: "What even was this?" },
-          { id: 8, url: "/images/memories/chaotic/2.jpg", caption: "Pure chaos" }
+          { id: 1, url: "/images/gallery/photo1.jpg", caption: "Absolutely gorgeous" },
+          { id: 2, url: "/images/gallery/photo2.jpg", caption: "Radiant smile" }
         ]
       },
       {
         id: "special",
-        title: "THE ONES I KEEP",
-        description: "My favorites",
+        title: "SPECIAL MEMORIES",
+        description: "Unforgettable times",
         photos: [
-          { id: 9, url: "/images/memories/special/1.jpg", caption: "This one stays" },
-          { id: 10, url: "/images/memories/special/2.jpg", caption: "Always remember this" }
+          { id: 3, url: "/images/gallery/photo3.jpg", caption: "Perfect moment" },
+          { id: 4, url: "/images/gallery/photo4.jpg", caption: "Simply amazing" }
+        ]
+      },
+      {
+        id: "homepage",
+        title: "FAVORITE SHOT",
+        description: "The best one",
+        photos: [
+          { id: 5, url: "/images/gallery/homepage.jpg", caption: "Always beautiful" }
         ]
       }
     ]

@@ -136,3 +136,53 @@ export async function GET(request: NextRequest) {
   }
 }
 
+// DELETE - Remove a login event
+export async function DELETE(request: NextRequest) {
+  try {
+    await requireAdmin();
+
+    if (!supabaseAdmin) {
+      return NextResponse.json(
+        { error: 'Database not configured' },
+        { status: 500 }
+      );
+    }
+
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json(
+        { error: 'Event ID required' },
+        { status: 400 }
+      );
+    }
+
+    const { error } = await supabaseAdmin
+      .from('login_events')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('[login-history] Delete error:', error);
+      return NextResponse.json(
+        { error: 'Failed to delete event' },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ 
+      message: 'Event deleted successfully' 
+    });
+  } catch (error: any) {
+    if (error.message === 'Unauthorized') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    console.error('[login-history] DELETE error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
