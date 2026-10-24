@@ -11,9 +11,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 interface SimiPasswordGateProps {
   onAuthenticated: () => void;
   onLogin: (password: string) => Promise<{ success: boolean; error?: string }>;
+  onForgotPassword?: () => void;
 }
 
-export default function SimiPasswordGate({ onAuthenticated, onLogin }: SimiPasswordGateProps) {
+export default function SimiPasswordGate({ onAuthenticated, onLogin, onForgotPassword }: SimiPasswordGateProps) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -184,6 +185,17 @@ export default function SimiPasswordGate({ onAuthenticated, onLogin }: SimiPassw
           <p className="mt-4 text-center text-pink-300/40 text-xs">
             Hint: This is your special password from Olajuwon 💝
           </p>
+
+          {/* Forgot Password Link */}
+          {onForgotPassword && (
+            <button
+              type="button"
+              onClick={onForgotPassword}
+              className="mt-3 w-full text-center text-pink-300/60 hover:text-pink-300/90 text-sm underline transition-colors"
+            >
+              Forgot Password?
+            </button>
+          )}
         </motion.form>
 
         {/* Decorative elements */}

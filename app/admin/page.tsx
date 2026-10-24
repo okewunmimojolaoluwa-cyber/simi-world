@@ -13,8 +13,9 @@ import DiaryViewer from '@/components/admin/DiaryViewer';
 import LoginHistory from '@/components/admin/LoginHistory';
 import SunshineManager from '@/components/admin/SunshineManager';
 import MusicManager from '@/components/admin/MusicManager';
+import PasswordChanges from '@/components/admin/PasswordChanges';
 
-type Tab = 'diary' | 'history' | 'sunshine' | 'music';
+type Tab = 'diary' | 'history' | 'sunshine' | 'music' | 'passwords';
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<Tab>('diary');
@@ -31,6 +32,7 @@ export default function AdminDashboard() {
     { id: 'history', label: 'Login History', icon: '📊' },
     { id: 'sunshine', label: 'Sunshine Gallery', icon: '☀️' },
     { id: 'music', label: 'Music Library', icon: '🎵' },
+    { id: 'passwords', label: 'Password Changes', icon: '🔐' },
   ];
 
   return (
@@ -99,6 +101,7 @@ export default function AdminDashboard() {
             {activeTab === 'history' && <LoginHistory />}
             {activeTab === 'sunshine' && <SunshineManager />}
             {activeTab === 'music' && <MusicManager />}
+            {activeTab === 'passwords' && <PasswordChanges />}
           </motion.div>
         </AnimatePresence>
       </div>

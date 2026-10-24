@@ -28,9 +28,10 @@ interface WorldRoomProps {
   state: UniverseState;
   updateState: (updates: Partial<UniverseState>) => void;
   onReplayIntro?: () => void;
+  onChangePassword?: () => void;
 }
 
-export default function WorldRoom({ state, updateState, onReplayIntro }: WorldRoomProps) {
+export default function WorldRoom({ state, updateState, onReplayIntro, onChangePassword }: WorldRoomProps) {
   const [currentView, setCurrentView] = useState<View>('home');
   const [timeOfDay, setTimeOfDay] = useState<'morning' | 'afternoon' | 'evening' | 'night'>('evening');
   const [birthdayMode, setBirthdayMode] = useState(false);
@@ -213,6 +214,38 @@ export default function WorldRoom({ state, updateState, onReplayIntro }: WorldRo
         {/* Show room interface only when on home view */}
         {currentView === 'home' && (
           <>
+            {/* Change Password Button - Floating Top Right */}
+            {onChangePassword && (
+              <motion.button
+                onClick={onChangePassword}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                style={{
+                  position: 'fixed',
+                  top: '20px',
+                  right: '20px',
+                  zIndex: 100,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '10px 16px',
+                  background: 'linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(168, 85, 247, 0.2))',
+                  backdropFilter: 'blur(20px)',
+                  border: '1px solid rgba(236, 72, 153, 0.3)',
+                  borderRadius: '9999px',
+                  color: 'rgba(255, 182, 193, 0.9)',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 20px rgba(236, 72, 153, 0.3)',
+                }}
+                className="change-password-btn"
+              >
+                <span style={{ fontSize: '16px' }}>🔐</span>
+                <span className="hidden sm:inline">Change Password</span>
+              </motion.button>
+            )}
+
             {/* Room Header */}
             <div className="room-header">
               <div>

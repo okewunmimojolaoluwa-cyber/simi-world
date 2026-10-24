@@ -7,9 +7,10 @@ interface NavigationHubProps {
   name: string;
   onNavigate: (view: any) => void;
   birthdayMode: boolean;
+  onChangePassword?: () => void;
 }
 
-export default function NavigationHub({ name, onNavigate, birthdayMode }: NavigationHubProps) {
+export default function NavigationHub({ name, onNavigate, birthdayMode, onChangePassword }: NavigationHubProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   const features: Array<{
@@ -36,6 +37,19 @@ export default function NavigationHub({ name, onNavigate, birthdayMode }: Naviga
       exit={{ opacity: 0 }}
       className="relative w-full h-full flex flex-col items-center justify-center px-4 sm:px-6 md:px-8 py-8"
     >
+      {/* Change Password Button - Top Right */}
+      {onChangePassword && (
+        <motion.button
+          onClick={onChangePassword}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="absolute top-4 right-4 sm:top-6 sm:right-6 flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-500/20 to-purple-500/20 backdrop-blur-xl rounded-full border border-pink-300/30 text-pink-200 font-semibold text-sm hover:from-pink-500/30 hover:to-purple-500/30 transition-all shadow-lg z-30"
+        >
+          <span className="text-base">🔐</span>
+          <span className="hidden sm:inline">Change Password</span>
+        </motion.button>
+      )}
+
       {/* Main Greeting - Clean & Centered */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}

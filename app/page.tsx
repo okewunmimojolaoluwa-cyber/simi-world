@@ -7,6 +7,7 @@ import { useAuth } from '@/hooks/useAuth';
 import LoadingScreen from '@/components/universe/LoadingScreen';
 import BirthdayGiftIntro from '@/components/universe/BirthdayGiftIntro';
 import SimiPasswordGate from '@/components/auth/SimiPasswordGate';
+import ChangePasswordModal from '@/components/auth/ChangePasswordModal';
 
 // Dynamically import WorldRoom with no SSR to prevent Three.js build issues
 const WorldRoom = dynamic(
@@ -72,6 +73,7 @@ export default function Universe() {
   const [showPasswordGate, setShowPasswordGate] = useState(false);
   const [introCompleted, setIntroCompleted] = useState(false);
   const [globalError, setGlobalError] = useState<Error | null>(null);
+  const [showChangePassword, setShowChangePassword] = useState(false);
 
   // Global error handler - MUST BE BEFORE ANY CONDITIONAL RETURNS
   useEffect(() => {
@@ -216,6 +218,15 @@ export default function Universe() {
         <SimiPasswordGate
           onAuthenticated={handleAuthenticated}
           onLogin={handleSimiLogin}
+          onForgotPassword={() => setShowChangePassword(true)}
+        />
+        <ChangePasswordModal
+          isOpen={showChangePassword}
+          onClose={() => setShowChangePassword(false)}
+          onSuccess={() => {
+            setShowChangePassword(false);
+            // Optionally show success message
+          }}
         />
       </main>
     );
@@ -337,9 +348,19 @@ export default function Universe() {
               state={state}
               updateState={updateState}
               onReplayIntro={handleReplayIntro}
+              onChangePassword={() => setShowChangePassword(true)}
             />
           </React.Suspense>
         </ErrorBoundary>
+        
+        {/* Change Password Modal */}
+        <ChangePasswordModal
+          isOpen={showChangePassword}
+          onClose={() => setShowChangePassword(false)}
+          onSuccess={() => {
+            setShowChangePassword(false);
+          }}
+        />
       </main>
     );
   }
