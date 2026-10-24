@@ -8,6 +8,7 @@ interface WorldSidebarProps {
   currentView: string;
   onNavigate: (view: any) => void;
   onReplayIntro?: () => void;
+  onChangePassword?: () => void;
 }
 
 const NAV = [
@@ -107,7 +108,7 @@ const itemVariants = {
   },
 };
 
-export default function WorldSidebar({ currentView, onNavigate, onReplayIntro }: WorldSidebarProps) {
+export default function WorldSidebar({ currentView, onNavigate, onReplayIntro, onChangePassword }: WorldSidebarProps) {
   const [open, setOpen] = useState(false);
   const [hov, setHov] = useState<string | null>(null);
 
@@ -210,6 +211,21 @@ export default function WorldSidebar({ currentView, onNavigate, onReplayIntro }:
             >
               <span>🗝</span>
               <span>Replay The Story</span>
+            </motion.button>
+          </div>
+        )}
+
+        {/* Change Password Button */}
+        {onChangePassword && (
+          <div className="px-3 pb-2 pt-0">
+            <motion.button
+              onClick={onChangePassword}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-pink-300 bg-pink-500/10 hover:bg-pink-500/20 border border-pink-400/30 shadow-sm transition-all cursor-pointer"
+            >
+              <span>🔐</span>
+              <span>Change Password</span>
             </motion.button>
           </div>
         )}
@@ -413,6 +429,23 @@ export default function WorldSidebar({ currentView, onNavigate, onReplayIntro }:
                   >
                     <span>🗝</span>
                     <span>Replay The Story</span>
+                  </motion.button>
+                </div>
+              )}
+
+              {/* Mobile Change Password Button */}
+              {onChangePassword && (
+                <div className="px-4 pb-2 pt-0">
+                  <motion.button
+                    onClick={() => {
+                      setOpen(false);
+                      onChangePassword();
+                    }}
+                    whileTap={{ scale: 0.96 }}
+                    className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold text-pink-300 bg-pink-500/10 border border-pink-400/30 shadow-sm transition-all cursor-pointer"
+                  >
+                    <span>🔐</span>
+                    <span>Change Password</span>
                   </motion.button>
                 </div>
               )}

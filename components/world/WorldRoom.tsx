@@ -186,7 +186,12 @@ export default function WorldRoom({ state, updateState, onReplayIntro, onChangeP
 
   return (
     <main className="world">
-      <WorldSidebar currentView={currentView} onNavigate={handleNavigate} onReplayIntro={onReplayIntro} />
+      <WorldSidebar 
+        currentView={currentView} 
+        onNavigate={handleNavigate} 
+        onReplayIntro={onReplayIntro}
+        onChangePassword={onChangePassword}
+      />
       
       <section className="room">
         {/* Background bedroom image with atmospheric overlay */}
@@ -214,29 +219,6 @@ export default function WorldRoom({ state, updateState, onReplayIntro, onChangeP
         {/* Show room interface only when on home view */}
         {currentView === 'home' && (
           <>
-            {/* Change Password Button - Floating Top Right */}
-            {onChangePassword && (
-              <motion.button
-                onClick={onChangePassword}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-                className="fixed top-4 right-4 z-[100] flex items-center gap-2 px-4 py-2.5 rounded-full font-semibold text-sm shadow-lg cursor-pointer"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(236, 72, 153, 0.3), rgba(168, 85, 247, 0.3))',
-                  backdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(236, 72, 153, 0.4)',
-                  color: '#ffb6c1',
-                  boxShadow: '0 4px 20px rgba(236, 72, 153, 0.4)',
-                }}
-              >
-                <span className="text-lg">🔐</span>
-                <span>Change Password</span>
-              </motion.button>
-            )}
-
             {/* Room Header */}
             <div className="room-header">
               <div>
