@@ -233,14 +233,16 @@ export default function SunshineManager() {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="relative w-full h-full">
+                    <div className="relative w-full h-full bg-black">
                       <video
                         src={item.url}
                         className="w-full h-full object-cover"
                         preload="metadata"
+                        playsInline
+                        muted
                       />
                       {/* Play button overlay */}
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/40 pointer-events-none">
                         <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border-2 border-white/50">
                           <svg className="w-8 h-8 text-white ml-1" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M8 5v14l11-7z" />
@@ -297,6 +299,7 @@ export default function SunshineManager() {
       <AnimatePresence>
         {viewingMedia && (
           <motion.div
+            key={viewingMedia.id}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -319,7 +322,7 @@ export default function SunshineManager() {
               </button>
 
               {/* Media Content */}
-              <div className="w-full h-full flex items-center justify-center">
+              <div className="w-full h-full flex items-center justify-center p-4">
                 {viewingMedia.type === 'photo' ? (
                   <img
                     src={viewingMedia.url}
@@ -331,8 +334,12 @@ export default function SunshineManager() {
                     src={viewingMedia.url}
                     controls
                     autoPlay
-                    className="max-w-full max-h-[90vh]"
-                  />
+                    playsInline
+                    className="max-w-full max-h-[80vh] w-auto rounded-lg"
+                    style={{ backgroundColor: '#000' }}
+                  >
+                    Your browser does not support the video tag.
+                  </video>
                 )}
               </div>
 
