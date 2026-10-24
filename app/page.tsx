@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { useUniverse } from '@/hooks/useUniverse';
 import { useAuth } from '@/hooks/useAuth';
 import LoadingScreen from '@/components/universe/LoadingScreen';
+import BirthdayGiftIntro from '@/components/universe/BirthdayGiftIntro';
 import SimiPasswordGate from '@/components/auth/SimiPasswordGate';
 
 // Dynamically import WorldRoom with no SSR to prevent Three.js build issues
@@ -67,6 +68,9 @@ const WorldRoom = dynamic(
 export default function Universe() {
   const { state, isLoading, updateState } = useUniverse();
   const { authenticated, userType, loading: authLoading, login } = useAuth();
+  const [isReplaying, setIsReplaying] = useState(false);
+  const [showPasswordGate, setShowPasswordGate] = useState(false);
+  const [introCompleted, setIntroCompleted] = useState(false);
   const [globalError, setGlobalError] = useState<Error | null>(null);
 
   // Global error handler - MUST BE BEFORE ANY CONDITIONAL RETURNS
@@ -98,9 +102,11 @@ export default function Universe() {
       stateExists: !!state, 
       isLoading, 
       authenticated, 
-      authLoading
+      authLoading,
+      introCompleted,
+      showPasswordGate 
     });
-  }, [state, isLoading, authenticated, authLoading]);
+  }, [state, isLoading, authenticated, authLoading, introCompleted, showPasswordGate]);
 
   // NOW safe to do conditional returns (all hooks are called above)
   
@@ -171,20 +177,40 @@ export default function Universe() {
     return <LoadingScreen />;
   }
 
+  const handleUnlockBirthday = () => {
+    // Mark intro as completed and show password gate
+    setIntroCompleted(true);
+    setShowPasswordGate(true);
+    setIsReplaying(false);
+  };
+
+  const handleReplayIntro = () => {
+    setIntroCompleted(false);
+    setIsReplaying(true);
+  };
+
   const handleSimiLogin = async (password: string) => {
     return await login(password, 'simi');
   };
 
   const handleAuthenticated = () => {
-    // Authentication complete, component will re-render and show dashboard
+    setShowPasswordGate(false);
   };
 
-  const handleReplayIntro = () => {
-    // No intro to replay anymore - this is kept for compatibility with WorldRoom
-  };
+  // Show birthday intro first (only if not completed yet)
+  if (!introCompleted || isReplaying) {
+    return (
+      <main className="fixed inset-0 overflow-clip">
+        <BirthdayGiftIntro
+          onUnlock={handleUnlockBirthday}
+          isReplay={isReplaying}
+        />
+      </main>
+    );
+  }
 
-  // Show password gate if not authenticated
-  if (!authenticated) {
+  // Show password gate after intro (before dashboard)
+  if (showPasswordGate || !authenticated) {
     return (
       <main className="fixed inset-0 overflow-clip">
         <SimiPasswordGate
@@ -249,6 +275,44 @@ export default function Universe() {
     }
 
     console.log('[Universe] 🎨 About to render WorldRoom component...');
+    
+    // TEMPORARY TEST: Show a simple test UI instead of WorldRoom
+    // This will help us identify if the issue is with WorldRoom or authentication
+    const TEST_MODE = false; // Set to true to enable test mode
+    
+    if (TEST_MODE) {
+      return (
+        <main className="fixed inset-0 overflow-clip" style={{
+          background: 'linear-gradient(135deg, #1a0f1e 0%, #2d1b3d 100%)',
+          color: '#fff',
+          padding: '40px',
+          fontFamily: 'system-ui, sans-serif'
+        }}>
+          <h1 style={{ fontSize: 32, marginBottom: 20 }}>🎉 Test Mode - Authentication Working!</h1>
+          <p style={{ marginBottom: 20, color: '#c4b5fd' }}>If you see this, authentication is working. The issue is with WorldRoom.</p>
+          <div style={{ background: 'rgba(0,0,0,0.3)', padding: 20, borderRadius: 8 }}>
+            <h2 style={{ fontSize: 20, marginBottom: 10 }}>State Info:</h2>
+            <pre style={{ fontSize: 12, overflow: 'auto' }}>{JSON.stringify(state, null, 2)}</pre>
+          </div>
+          <button 
+            onClick={() => window.location.reload()} 
+            style={{ 
+              marginTop: 20, 
+              padding: '12px 24px', 
+              background: '#c4b5fd', 
+              color: '#1a0f1e', 
+              border: 'none', 
+              borderRadius: 8, 
+              cursor: 'pointer',
+              fontSize: 16,
+              fontWeight: 600
+            }}
+          >
+            Reload
+          </button>
+        </main>
+      );
+    }
     
     return (
       <main className="fixed inset-0 overflow-clip">
