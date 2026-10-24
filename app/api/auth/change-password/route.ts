@@ -17,10 +17,18 @@ export async function POST(request: NextRequest) {
     const cookieStore = await cookies();
     const session = await getIronSession<SessionData>(cookieStore, sessionOptions);
 
-    if (!session.isLoggedIn || session.role !== 'simi') {
+    if (!session.isLoggedIn) {
       return NextResponse.json(
-        { error: 'Unauthorized. Only Simi can change password.' },
+        { error: 'Unauthorized. Please login first.' },
         { status: 401 }
+      );
+    }
+
+    // Only Simi can change password (admin cannot)
+    if (session.role === 'admin') {
+      return NextResponse.json(
+        { error: 'Admin cannot change Simi\'s password from here.' },
+        { status: 403 }
       );
     }
 

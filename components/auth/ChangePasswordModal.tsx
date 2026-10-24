@@ -127,9 +127,7 @@ export default function ChangePasswordModal({ isOpen, onClose, onSuccess }: Chan
               </motion.div>
               <h3 className="text-2xl font-bold text-white mb-2">Password Changed!</h3>
               <p className="text-pink-200/80">
-                Your new password has been set successfully.
-                <br />
-                Admin has been notified! 🔐
+                Your new password has been set successfully! 🔐
               </p>
             </div>
           )}
@@ -141,8 +139,6 @@ export default function ChangePasswordModal({ isOpen, onClose, onSuccess }: Chan
               <h3 className="text-2xl font-bold text-white mb-3">Are you sure?</h3>
               <p className="text-pink-200/80 mb-6">
                 Do you want to change your password?
-                <br />
-                Admin will be able to see your new password.
               </p>
               <div className="flex gap-3">
                 <button
@@ -271,11 +267,6 @@ export default function ChangePasswordModal({ isOpen, onClose, onSuccess }: Chan
                     </motion.div>
                   )}
                 </AnimatePresence>
-
-                {/* Info */}
-                <div className="p-3 bg-yellow-500/10 border border-yellow-400/20 rounded-lg text-yellow-200 text-xs text-center">
-                  ⚠️ Admin will be notified and can see your new password
-                </div>
 
                 {/* Buttons */}
                 <div className="flex gap-3 pt-2">
