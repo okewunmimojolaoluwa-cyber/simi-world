@@ -11,6 +11,7 @@ import {
   setIsPlaying,
   getCurrentTrack,
   subscribeToMusic,
+  reloadTracks,
   TRACKS 
 } from '@/lib/globalMusic';
 
@@ -76,6 +77,9 @@ export default function MusicPlayer({ state, updateState, onBack }: MusicPlayerP
   // Get global audio instance and sync with global state
   useEffect(() => {
     audioRef.current = getGlobalAudio();
+    
+    // Force reload tracks from database to get latest uploads
+    reloadTracks();
     
     // Sync with current global state when component mounts
     const globalTrackIdx = getCurrentTrackIndex();

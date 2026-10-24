@@ -22,7 +22,8 @@ interface MediaItem {
   badge: string;
 }
 
-const ITEMS: MediaItem[] = [
+// Default hardcoded items (always shown)
+const DEFAULT_ITEMS: MediaItem[] = [
   {
     id: 'pic-1',
     type: 'photo',
@@ -85,19 +86,67 @@ export default function MemoryGallery({ onBack }: MemoryGalleryProps) {
   const [filter, setFilter] = useState<MediaFilter>('all');
   const [selectedItem, setSelectedItem] = useState<MediaItem | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [items, setItems] = useState<MediaItem[]>(DEFAULT_ITEMS);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch media from database and combine with hardcoded items
+  useEffect(() => {
+    const fetchMedia = async () => {
+      try {
+        // Fetch photos and videos from API
+        const [photosRes, videosRes] = await Promise.all([
+          fetch('/api/media?type=photo'),
+          fetch('/api/media?type=video')
+        ]);
+
+        const photosData = await photosRes.json();
+        const videosData = await videosRes.json();
+
+        const dbPhotos = (photosData.media || []).map((item: any, index: number) => ({
+          id: `db-pic-${item.id}`,
+          type: 'photo' as const,
+          src: item.publicUrl,
+          title: item.title || `Photo ${index + 1}`,
+          caption: item.description || 'Beautiful moment captured',
+          badge: 'UPLOADED',
+        }));
+
+        const dbVideos = (videosData.media || []).map((item: any, index: number) => ({
+          id: `db-vid-${item.id}`,
+          type: 'video' as const,
+          src: item.publicUrl,
+          title: item.title || `Video ${index + 1}`,
+          caption: item.description || 'Special memory',
+          badge: 'UPLOADED',
+        }));
+
+        // Combine hardcoded items with database items
+        const combinedItems = [...DEFAULT_ITEMS, ...dbPhotos, ...dbVideos];
+        setItems(combinedItems);
+      } catch (error) {
+        console.error('[MemoryGallery] Error fetching media:', error);
+        // Keep default items on error
+        setItems(DEFAULT_ITEMS);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMedia();
+  }, []);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  const filteredItems = ITEMS.filter((item) => {
+  const filteredItems = items.filter((item) => {
     if (filter === 'photos') return item.type === 'photo';
     if (filter === 'videos') return item.type === 'video';
     return true;
   });
 
-  const photoCount = ITEMS.filter((i) => i.type === 'photo').length;
-  const videoCount = ITEMS.filter((i) => i.type === 'video').length;
+  const photoCount = items.filter((i) => i.type === 'photo').length;
+  const videoCount = items.filter((i) => i.type === 'video').length;
 
   const handleNext = useCallback(() => {
     if (!selectedItem) return;
@@ -194,7 +243,7 @@ export default function MemoryGallery({ onBack }: MemoryGalleryProps) {
                 : 'text-[#c4b5fd]/80 hover:text-white hover:bg-white/10'
             }`}
           >
-            All ({ITEMS.length})
+            All ({items.length})
           </button>
 
           <button
@@ -220,11 +269,22 @@ export default function MemoryGallery({ onBack }: MemoryGalleryProps) {
           </button>
         </div>
 
+        {/* Loading State */}
+        {loading && (
+          <div className="w-full text-center py-12">
+            <div className="inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-black/50 border border-[#c4b5fd]/25 backdrop-blur-2xl">
+              <div className="w-5 h-5 border-2 border-[#818cf8] border-t-transparent rounded-full animate-spin"></div>
+              <span className="text-sm text-[#c4b5fd] font-medium">Loading memories...</span>
+            </div>
+          </div>
+        )}
+
         {/* Gallery Grid - 2 columns on mobile, 3 on tablet, 4 on desktop */}
-        <motion.div
-          layout
-          className="w-full grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5"
-        >
+        {!loading && (
+          <motion.div
+            layout
+            className="w-full grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5"
+          >
           <AnimatePresence>
             {filteredItems.map((item, index) => (
               <motion.div
@@ -294,6 +354,7 @@ export default function MemoryGallery({ onBack }: MemoryGalleryProps) {
             ))}
           </AnimatePresence>
         </motion.div>
+        )}
       </div>
 
       {/* ══════════════ FULLSCREEN THEATER VIEWER (Mounted to document.body) ══════════════ */}

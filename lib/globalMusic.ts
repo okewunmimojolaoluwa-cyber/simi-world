@@ -38,6 +38,16 @@ let tracksLoaded = false;
 export let TRACKS: Track[] = DEFAULT_TRACKS;
 
 /**
+ * Force reload tracks from database
+ * Call this to refresh the music library
+ */
+export async function reloadTracks(): Promise<void> {
+  tracksLoaded = false;
+  await loadTracksFromDatabase();
+  notifyListeners();
+}
+
+/**
  * Fetch tracks from database
  */
 async function loadTracksFromDatabase(): Promise<void> {
