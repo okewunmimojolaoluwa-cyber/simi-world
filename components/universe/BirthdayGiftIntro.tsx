@@ -84,12 +84,12 @@ export default function BirthdayGiftIntro({ onUnlock }: BirthdayGiftIntroProps) 
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Performance-optimized counts based on device
-  const particleCount = isMobile ? 8 : 30; // 73% reduction on mobile
-  const lightParticleCount = isMobile ? 10 : 35; // 71% reduction on mobile
-  const beamCount = isMobile ? 2 : 8; // 75% reduction on mobile
-  const sparkleCount = isMobile ? 4 : 12; // 67% reduction on mobile
-  const orbitStarCount = isMobile ? 2 : 6; // 67% reduction on mobile
+  // Performance-optimized counts based on device - Further reduced for faster loading
+  const particleCount = isMobile ? 4 : 15; // Reduced from 8:30
+  const lightParticleCount = isMobile ? 5 : 20; // Reduced from 10:35
+  const beamCount = isMobile ? 1 : 4; // Reduced from 2:8
+  const sparkleCount = isMobile ? 2 : 6; // Reduced from 4:12
+  const orbitStarCount = isMobile ? 1 : 3; // Reduced from 2:6
 
   const handleAdminLogin = async (password: string) => {
     console.log('[BirthdayGiftIntro] handleAdminLogin called with password');
