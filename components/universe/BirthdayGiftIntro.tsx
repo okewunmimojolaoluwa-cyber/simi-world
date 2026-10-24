@@ -667,15 +667,23 @@ export default function BirthdayGiftIntro({ onUnlock }: BirthdayGiftIntroProps) 
                   transition={{ delay: 0.3 }}
                   style={{ fontFamily: 'var(--font-playfair), Georgia, serif', fontSize: 'clamp(1.6rem, 5vw, 2.8rem)', fontWeight: 700, color: '#ffffff', letterSpacing: '-0.03em', lineHeight: 1.1, marginBottom: 8 }}
                 >
-                  Find the combination.
+                  Find the combination to unlock your gift.
                 </motion.h1>
                 <motion.p
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.4 }}
-                  style={{ fontSize: 'clamp(12px, 3vw, 14px)', color: 'rgba(196,181,253,0.6)', maxWidth: 500 }}
+                  style={{ fontSize: 'clamp(12px, 3vw, 14px)', color: 'rgba(196,181,253,0.7)', maxWidth: 500, marginBottom: 4 }}
                 >
                   Three objects in the room hold your birthday secret. Explore each one.
+                </motion.p>
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.5 }}
+                  style={{ fontSize: 'clamp(11px, 2.8vw, 13px)', color: 'rgba(255,215,0,0.8)', maxWidth: 500, fontWeight: 600 }}
+                >
+                  💡 The gift box is locked — find the 4-digit code to open it!
                 </motion.p>
               </div>
 
@@ -773,8 +781,11 @@ export default function BirthdayGiftIntro({ onUnlock }: BirthdayGiftIntroProps) 
                   <h3 style={{ fontFamily: 'var(--font-playfair), Georgia, serif', fontSize: 'clamp(1.1rem, 3vw, 1.4rem)', fontWeight: 500, color: '#ffffff', marginBottom: 8, letterSpacing: '-0.01em', textAlign: 'center' }}>
                     The Birthday Box
                   </h3>
-                  <p style={{ fontSize: 12, color: 'rgba(245,230,184,0.55)', lineHeight: 1.6, textAlign: 'center' }}>
-                    Wrapped in midnight velvet. Sealed with a brass combination lock.
+                  <p style={{ fontSize: 12, color: 'rgba(245,230,184,0.75)', lineHeight: 1.6, textAlign: 'center', marginBottom: 8 }}>
+                    Wrapped in midnight velvet. <strong style={{ color: '#ffd700' }}>Open the lock to unbox your gift!</strong>
+                  </p>
+                  <p style={{ fontSize: 11, color: 'rgba(196,181,253,0.6)', lineHeight: 1.5, textAlign: 'center', fontStyle: 'italic' }}>
+                    Find the 4-digit combination to unlock...
                   </p>
                 </motion.button>
 
