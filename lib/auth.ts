@@ -27,19 +27,56 @@ export interface SessionData {
 }
 
 /**
- * Validate password against environment variable
+ * Get the current active password for a user
+ * Checks database first, falls back to environment variable
  */
-export function validatePassword(password: string, userType: UserType): boolean {
-  const expectedPassword = userType === 'simi'
+export async function getCurrentPassword(userType: UserType): Promise<string | null> {
+  // Try to get latest password from database
+  if (supabaseAdmin) {
+    try {
+      const { data, error } = await supabaseAdmin
+        .from('password_changes')
+        .select('new_password')
+        .eq('user_type', userType)
+        .order('change_timestamp', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (!error && data?.new_password) {
+        console.log(`[auth] Using database password for ${userType}`);
+        return data.new_password;
+      }
+    } catch (err) {
+      console.warn(`[auth] Could not fetch password from database for ${userType}:`, err);
+    }
+  }
+
+  // Fall back to environment variable
+  const envPassword = userType === 'simi'
     ? process.env.SIMI_ACCESS_PASSWORD
     : process.env.ADMIN_ACCESS_PASSWORD;
 
-  if (!expectedPassword) {
-    console.error(`[auth] ${userType.toUpperCase()} password not configured in environment`);
+  if (envPassword) {
+    console.log(`[auth] Using environment password for ${userType}`);
+    return envPassword;
+  }
+
+  console.error(`[auth] No password configured for ${userType}`);
+  return null;
+}
+
+/**
+ * Validate password against database (latest) or environment variable
+ */
+export async function validatePassword(password: string, userType: UserType): Promise<boolean> {
+  const currentPassword = await getCurrentPassword(userType);
+  
+  if (!currentPassword) {
+    console.error(`[auth] ${userType.toUpperCase()} password not configured`);
     return false;
   }
 
-  return password === expectedPassword;
+  return password === currentPassword;
 }
 
 /**

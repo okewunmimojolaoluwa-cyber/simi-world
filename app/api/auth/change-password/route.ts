@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate current password
-    const isCurrentValid = validatePassword(currentPassword, 'simi');
+    const isCurrentValid = await validatePassword(currentPassword, 'simi');
     if (!isCurrentValid) {
       return NextResponse.json(
         { error: 'Current password is incorrect' },

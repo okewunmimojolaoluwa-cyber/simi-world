@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate password
-    const isValid = validatePassword(password, userType);
+    const isValid = await validatePassword(password, userType);
 
     if (!isValid) {
       await recordFailedAttempt(ipAddress, userType);
