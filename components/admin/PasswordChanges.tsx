@@ -36,11 +36,15 @@ export default function PasswordChanges() {
         const data = await response.json();
         setChanges(data.changes || []);
         setUnviewedCount(data.unviewedCount || 0);
+        setError('');
       } else {
-        setError('Failed to load password changes');
+        const data = await response.json().catch(() => ({ error: 'Unknown error' }));
+        console.error('Password changes error:', data);
+        setError(data.error || `Failed to load (${response.status})`);
       }
     } catch (err) {
-      setError('Network error');
+      console.error('Password changes fetch error:', err);
+      setError(err instanceof Error ? err.message : 'Network error');
     } finally {
       setLoading(false);
     }
@@ -92,8 +96,51 @@ export default function PasswordChanges() {
 
   if (error) {
     return (
-      <div className="p-4 bg-red-500/10 border border-red-400/20 rounded-lg text-red-200 text-center">
-        {error}
+      <div className="space-y-4">
+        <div className="p-6 bg-red-500/10 border border-red-400/20 rounded-xl">
+          <div className="flex items-start gap-3 mb-4">
+            <span className="text-3xl">⚠️</span>
+            <div className="flex-1">
+              <h3 className="text-xl font-bold text-red-200 mb-2">Failed to Load Password Changes</h3>
+              <p className="text-red-300 mb-3">{error}</p>
+              <button
+                onClick={fetchChanges}
+                className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-200 rounded-lg transition-colors font-medium"
+              >
+                🔄 Try Again
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Setup Instructions */}
+        <details className="p-4 bg-gray-800/50 border border-gray-700/30 rounded-xl">
+          <summary className="cursor-pointer text-white font-semibold hover:text-gray-300 select-none">
+            📖 Setup Instructions (if table doesn't exist)
+          </summary>
+          <div className="mt-4 space-y-3 text-sm text-gray-300">
+            <p>If you're seeing this error, the password_changes table might not be set up yet.</p>
+            <div className="p-3 bg-black/30 rounded-lg">
+              <p className="text-yellow-300 mb-2 font-medium">Run this SQL in Supabase:</p>
+              <pre className="text-xs text-green-300 overflow-x-auto">
+{`CREATE TABLE IF NOT EXISTS password_changes (
+  id SERIAL PRIMARY KEY,
+  user_type VARCHAR(10) NOT NULL,
+  old_password_hint VARCHAR(50),
+  new_password VARCHAR(255) NOT NULL,
+  change_timestamp TIMESTAMP DEFAULT NOW(),
+  ip_address VARCHAR(50),
+  user_agent TEXT,
+  admin_viewed BOOLEAN DEFAULT FALSE,
+  admin_viewed_at TIMESTAMP
+);`}
+              </pre>
+            </div>
+            <p className="text-gray-400 text-xs">
+              Go to Supabase Dashboard → SQL Editor → Run the above query
+            </p>
+          </div>
+        </details>
       </div>
     );
   }

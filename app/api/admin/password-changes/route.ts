@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
 
     if (!supabaseAdmin) {
       return NextResponse.json(
-        { error: 'Database not configured' },
+        { error: 'Database not configured. Check SUPABASE_SERVICE_ROLE_KEY in .env' },
         { status: 500 }
       );
     }
@@ -40,8 +40,17 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       console.error('[password-changes] Fetch error:', error);
+      
+      // Provide helpful error messages
+      if (error.code === '42P01') {
+        return NextResponse.json(
+          { error: 'Table "password_changes" does not exist. Run the setup SQL in Supabase.' },
+          { status: 500 }
+        );
+      }
+      
       return NextResponse.json(
-        { error: 'Failed to fetch password changes' },
+        { error: `Database error: ${error.message}` },
         { status: 500 }
       );
     }
