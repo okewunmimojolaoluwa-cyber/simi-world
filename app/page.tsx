@@ -8,6 +8,7 @@ import LoadingScreen from '@/components/universe/LoadingScreen';
 import BirthdayGiftIntro from '@/components/universe/BirthdayGiftIntro';
 import SimiPasswordGate from '@/components/auth/SimiPasswordGate';
 import ChangePasswordModal from '@/components/auth/ChangePasswordModal';
+import ForgotPasswordModal from '@/components/auth/ForgotPasswordModal';
 
 // Dynamically import WorldRoom with no SSR to prevent Three.js build issues
 const WorldRoom = dynamic(
@@ -74,6 +75,7 @@ export default function Universe() {
   const [introCompleted, setIntroCompleted] = useState(false);
   const [globalError, setGlobalError] = useState<Error | null>(null);
   const [showChangePassword, setShowChangePassword] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
 
   // Global error handler - MUST BE BEFORE ANY CONDITIONAL RETURNS
   useEffect(() => {
@@ -218,14 +220,15 @@ export default function Universe() {
         <SimiPasswordGate
           onAuthenticated={handleAuthenticated}
           onLogin={handleSimiLogin}
-          onForgotPassword={() => setShowChangePassword(true)}
+          onForgotPassword={() => setShowForgotPassword(true)}
         />
-        <ChangePasswordModal
-          isOpen={showChangePassword}
-          onClose={() => setShowChangePassword(false)}
-          onSuccess={() => {
-            setShowChangePassword(false);
-            // Optionally show success message
+        <ForgotPasswordModal
+          isOpen={showForgotPassword}
+          onClose={() => setShowForgotPassword(false)}
+          onSuccess={(newPassword) => {
+            setShowForgotPassword(false);
+            // Optionally auto-login with new password
+            alert(`Password reset successfully! Your new password is: ${newPassword}\n\nYou can now login with this password.`);
           }}
         />
       </main>

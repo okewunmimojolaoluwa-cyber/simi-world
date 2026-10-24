@@ -240,6 +240,12 @@ export default function SunshineManager() {
                         preload="metadata"
                         playsInline
                         muted
+                        onError={(e) => {
+                          console.error('Video thumbnail error:', item.url, e);
+                        }}
+                        onLoadedMetadata={(e) => {
+                          console.log('Video metadata loaded:', item.url);
+                        }}
                       />
                       {/* Play button overlay */}
                       <div className="absolute inset-0 flex items-center justify-center bg-black/40 pointer-events-none">
